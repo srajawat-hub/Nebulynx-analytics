@@ -36,7 +36,13 @@ const Asset = () => {
       setCurrentPrice(priceRes.data);
     } catch (error) {
       console.error('Error fetching asset data:', error);
-      toast.error('Failed to load asset data');
+      if (error.response?.status === 404) {
+        toast.error(`Asset ${symbol} not found. Please check the symbol.`);
+      } else if (error.response?.status === 400) {
+        toast.error(error.response.data?.error || 'Invalid asset symbol');
+      } else {
+        toast.error('Failed to load asset data. Please try again.');
+      }
     } finally {
       setLoading(false);
     }

@@ -1,5 +1,6 @@
 const axios = require('axios');
 const { getDatabase } = require('../database/database');
+const { SUPPORTED_ASSETS } = require('./priceMonitor');
 
 const COINGECKO_API = 'https://api.coingecko.com/api/v3';
 const BINANCE_API = 'https://api.binance.com/api/v3';
@@ -213,8 +214,35 @@ async function getAssetDetails(symbol) {
       'SELECT * FROM asset_details WHERE asset_symbol = ?',
       [symbol],
       (err, row) => {
-        if (err) reject(err);
-        else resolve(row);
+        if (err) {
+          reject(err);
+        } else if (row) {
+          resolve(row);
+        } else {
+          // Fallback: return basic asset info if not in database
+          const config = ASSET_CONFIG[symbol];
+          if (config) {
+            resolve({
+              asset_symbol: symbol,
+              asset_name: SUPPORTED_ASSETS[symbol]?.name || symbol,
+              market_cap: null,
+              volume_24h: null,
+              circulating_supply: null,
+              total_supply: null,
+              max_supply: null,
+              launch_date: config.launch_date,
+              description: config.description,
+              website: config.website,
+              whitepaper: config.whitepaper,
+              github: null,
+              twitter: null,
+              reddit: null,
+              last_updated: new Date().toISOString()
+            });
+          } else {
+            resolve(null);
+          }
+        }
       }
     );
   });
