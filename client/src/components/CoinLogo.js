@@ -13,7 +13,7 @@ const CoinLogo = ({ symbol, size = 32, className = '' }) => {
     'LINK': 'https://assets.coingecko.com/coins/images/877/large/chainlink.png',
     'LTC': 'https://assets.coingecko.com/coins/images/2/large/litecoin.png',
     'BCH': 'https://assets.coingecko.com/coins/images/780/large/bitcoin_cash.png',
-    'TON': 'https://assets.coingecko.com/coins/images/17980/large/ton_symbol.png',
+    'TON': 'https://assets.coingecko.com/coins/images/11939/large/tokamak-network.png',
     'GOLD': 'https://assets.coingecko.com/coins/images/279/large/ethereum.png' // Using ETH logo as placeholder for gold
   };
 
@@ -31,7 +31,7 @@ const CoinLogo = ({ symbol, size = 32, className = '' }) => {
       'LINK': '#2A5ADA',
       'LTC': '#BFBBBB',
       'BCH': '#0AC18E',
-      'TON': '#0088CC',
+      'TON': '#FF6B35',
       'GOLD': '#FFD700'
     };
     return colors[symbol] || '#667eea';

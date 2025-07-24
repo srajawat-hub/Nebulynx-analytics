@@ -51,55 +51,38 @@ async function fetchCryptoPrice(symbol) {
   const config = SUPPORTED_ASSETS[symbol];
   if (!config) return null;
 
-  // Special handling for TON (Tokamak Network) - Binance doesn't have it
+  // Special handling for TON (Tokamak Network) - Only CoinGecko has the correct data
   if (symbol === 'TON') {
-    const tonApis = [
-      {
-        name: 'CoinGecko',
-        url: `${COINGECKO_API}/simple/price`,
+    try {
+      await new Promise(resolve => setTimeout(resolve, 500));
+      
+      console.log(`🔍 Trying CoinGecko for ${symbol} (Tokamak Network)...`);
+      const response = await axios.get(`${COINGECKO_API}/simple/price`, {
         params: {
           ids: config.coingecko_id,
           vs_currencies: 'usd'
         },
-        extract: (data) => data[config.coingecko_id]?.usd
-      },
-      {
-        name: 'CryptoCompare',
-        url: `${CRYPTOCOMPARE_API}/price`,
-        params: { fsym: 'TON', tsyms: 'USD' },
-        extract: (data) => data.USD
+        timeout: 10000,
+        headers: {
+          'User-Agent': 'Trading-Notification-App/1.0'
+        }
+      });
+      
+      const price = response.data[config.coingecko_id]?.usd;
+      if (price && price > 0) {
+        console.log(`✅ Real ${symbol} (Tokamak Network) price from CoinGecko: $${price}`);
+        return price;
       }
-    ];
-
-    for (const api of tonApis) {
-      try {
-        await new Promise(resolve => setTimeout(resolve, 300));
-        
-        console.log(`🔍 Trying ${api.name} for ${symbol} (Tokamak Network)...`);
-        const response = await axios.get(api.url, {
-          params: api.params,
-          timeout: 10000,
-          headers: {
-            'User-Agent': 'Trading-Notification-App/1.0'
-          }
-        });
-        
-        const price = api.extract(response.data);
-        if (price && price > 0) {
-          console.log(`✅ Real ${symbol} (Tokamak Network) price from ${api.name}: $${price}`);
-          return price;
-        }
-      } catch (error) {
-        if (error.response?.status === 429) {
-          console.log(`Rate limited by ${api.name}, trying next...`);
-        } else {
-          console.log(`❌ ${api.name} failed for ${symbol}: ${error.message}`);
-        }
+    } catch (error) {
+      if (error.response?.status === 429) {
+        console.log(`Rate limited by CoinGecko for ${symbol} (Tokamak Network), using fallback price`);
+      } else {
+        console.log(`❌ CoinGecko failed for ${symbol} (Tokamak Network): ${error.message}`);
       }
     }
     
-    console.log(`⚠️ All APIs failed for ${symbol} (Tokamak Network), using fallback price`);
-    return 1.4; // Current approximate price for Tokamak Network TON
+    console.log(`⚠️ CoinGecko failed for ${symbol} (Tokamak Network), using fallback price`);
+    return 1.37; // Current approximate price for Tokamak Network TON
   }
 
   // Standard APIs for other cryptocurrencies

@@ -135,7 +135,7 @@ async function fetchAssetDetails(symbol) {
       'LINK': { market_cap: 8000000000, volume_24h: 500000000, circulating_supply: 1000000000, total_supply: 1000000000, max_supply: 1000000000 },
       'LTC': { market_cap: 6000000000, volume_24h: 300000000, circulating_supply: 74000000, total_supply: 84000000, max_supply: 84000000 },
       'BCH': { market_cap: 4000000000, volume_24h: 200000000, circulating_supply: 19500000, total_supply: 21000000, max_supply: 21000000 },
-      'TON': { market_cap: 2000000000, volume_24h: 100000000, circulating_supply: 5000000000, total_supply: 5000000000, max_supply: 5000000000 },
+      'TON': { market_cap: 685000000, volume_24h: 5000000, circulating_supply: 500000000, total_supply: 500000000, max_supply: 500000000 },
       'GOLD': { market_cap: 15000000000000, volume_24h: 50000000000, circulating_supply: null, total_supply: null, max_supply: null }
     };
     

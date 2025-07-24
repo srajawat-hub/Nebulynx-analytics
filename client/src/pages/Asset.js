@@ -424,6 +424,16 @@ const Asset = () => {
                       domain={['dataMin - 0.1', 'dataMax + 0.1']}
                       axisLine={false}
                       tickLine={false}
+                      tickFormatter={(value) => {
+                        // Format to show clean whole numbers
+                        if (value >= 1000) {
+                          return `${(value / 1000).toFixed(0)}K`;
+                        } else if (value >= 1) {
+                          return value.toFixed(0);
+                        } else {
+                          return value.toFixed(2);
+                        }
+                      }}
                     />
                     <Tooltip 
                       contentStyle={{
