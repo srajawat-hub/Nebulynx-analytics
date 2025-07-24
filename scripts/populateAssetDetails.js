@@ -48,7 +48,17 @@ async function populateAssetDetails() {
   }
   
   console.log('Asset details population completed!');
-  process.exit(0);
 }
 
-populateAssetDetails(); 
+// Export the function for use in server.js
+module.exports = { populateAssetDetails };
+
+// Run directly if this script is executed
+if (require.main === module) {
+  populateAssetDetails().then(() => {
+    process.exit(0);
+  }).catch((error) => {
+    console.error('Error:', error);
+    process.exit(1);
+  });
+} 

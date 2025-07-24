@@ -5,7 +5,7 @@ const rateLimit = require('express-rate-limit');
 const path = require('path');
 require('dotenv').config();
 
-const { initializeDatabase } = require('./database/database');
+const { initializeDatabase, populateInitialPriceHistory } = require('./database/database');
 const alertRoutes = require('./routes/alerts');
 const priceRoutes = require('./routes/prices');
 const notificationRoutes = require('./routes/notifications');
@@ -44,6 +44,43 @@ app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Trading Notification API is running' });
 });
 
+// Database health check endpoint
+app.get('/api/health/db', async (req, res) => {
+  try {
+    const { getDatabase } = require('./database/database');
+    const db = getDatabase();
+    
+    // Check if we can query the database
+    const assetCount = await new Promise((resolve, reject) => {
+      db.get("SELECT COUNT(*) as count FROM asset_details", (err, row) => {
+        if (err) reject(err);
+        else resolve(row.count);
+      });
+    });
+    
+    const priceCount = await new Promise((resolve, reject) => {
+      db.get("SELECT COUNT(*) as count FROM price_history", (err, row) => {
+        if (err) reject(err);
+        else resolve(row.count);
+      });
+    });
+    
+    res.json({ 
+      status: 'OK', 
+      message: 'Database is working',
+      asset_details_count: assetCount,
+      price_history_count: priceCount
+    });
+  } catch (error) {
+    console.error('Database health check failed:', error);
+    res.status(500).json({ 
+      status: 'ERROR', 
+      message: 'Database health check failed',
+      error: error.message 
+    });
+  }
+});
+
 // Serve static files from the React app
 if (process.env.NODE_ENV === 'production') {
   app.use(express.static(path.join(__dirname, 'client/build')));
@@ -65,6 +102,15 @@ async function startServer() {
   try {
     await initializeDatabase();
     console.log('Database initialized successfully');
+    
+    // Populate asset details if needed
+    const { populateAssetDetails } = require('./scripts/populateAssetDetails');
+    await populateAssetDetails();
+    console.log('Asset details populated successfully');
+    
+    // Populate initial price history if needed
+    await populateInitialPriceHistory();
+    console.log('Initial price history populated successfully');
     
     // Start price monitoring service
     startPriceMonitoring();
