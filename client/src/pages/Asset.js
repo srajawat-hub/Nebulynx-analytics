@@ -72,7 +72,27 @@ const Asset = () => {
     if (!data || !Array.isArray(data)) return [];
     
     return data.map(item => {
-      const date = new Date(item.timestamp);
+      // Handle different timestamp formats
+      let date;
+      if (typeof item.timestamp === 'string') {
+        // Try to parse different timestamp formats
+        if (item.timestamp.includes('T')) {
+          // ISO format: "2025-07-23T00:00:00.000Z"
+          date = new Date(item.timestamp);
+        } else {
+          // Custom format: "2025-07-24 15:03:00"
+          date = new Date(item.timestamp.replace(' ', 'T') + 'Z');
+        }
+      } else {
+        date = new Date(item.timestamp);
+      }
+      
+      // Validate date
+      if (isNaN(date.getTime())) {
+        console.warn('Invalid date:', item.timestamp);
+        return null;
+      }
+      
       let timeLabel;
       
       // Format based on selected period
@@ -99,7 +119,8 @@ const Asset = () => {
       }
       
       return {
-        time: timeLabel,
+        time: date.getTime(), // Use timestamp for X-axis
+        timeLabel: timeLabel, // Keep formatted label for reference
         price: parseFloat(item.price),
         timestamp: date.getTime(),
         fullDate: date.toLocaleString('en-US', {
@@ -110,7 +131,7 @@ const Asset = () => {
           minute: '2-digit'
         })
       };
-    });
+    }).filter(item => item !== null); // Remove invalid items
   };
 
 

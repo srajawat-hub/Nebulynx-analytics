@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { FaEye, FaTrash, FaChartBar } from 'react-icons/fa';
+import { Link, useNavigate } from 'react-router-dom';
+import { FaEye, FaTrash, FaChartBar, FaChartLine, FaBell } from 'react-icons/fa';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 
@@ -7,7 +8,7 @@ const Notifications = () => {
   const [notifications, setNotifications] = useState([]);
   const [stats, setStats] = useState({});
   const [loading, setLoading] = useState(true);
-  const [deleting, setDeleting] = useState(null);
+  const navigate = useNavigate();
 
   useEffect(() => {
     fetchNotifications();
@@ -52,226 +53,209 @@ const Notifications = () => {
     }
   };
 
+  const formatPrice = (price, currency) => {
+    if (currency === 'INR') {
+      return `₹${price.toLocaleString('en-IN')}`;
+    }
+    return `$${price.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 4 })}`;
+  };
+
   if (loading) {
     return (
-      <div className="loading">
-        <div className="spinner"></div>
+      <div className="modern-loading">
+        <div className="modern-spinner"></div>
       </div>
     );
   }
 
   return (
-    <div>
-      <div className="flex flex-between mb-3">
-        <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#222', marginBottom: '0' }}>
-          Notifications
-        </h1>
-        <button
-          onClick={cleanupNotifications}
-          className="btn btn-secondary"
-        >
-          <FaTrash style={{ marginRight: '8px' }} />
-          Cleanup Old
-        </button>
-      </div>
-      <p style={{ fontSize: '16px', color: '#444', marginBottom: '24px' }}>
-        View and manage your recent price notifications. Clean up old notifications to keep your dashboard tidy.
-      </p>
+    <div className="modern-min-h-screen modern-bg-gradient">
+      {/* Main Header - Logo and Navigation */}
+      <div className="modern-header" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <div className="modern-container" style={{ maxWidth: '100%', padding: '0 2rem' }}>
+          <div className="modern-flex modern-flex-between modern-p-4">
+            {/* Left Side - Logo */}
+            <div className="modern-flex modern-items-center modern-space-x-3">
+              <div className="modern-icon-bg modern-w-10 modern-h-10 modern-gradient-bg-blue">
+                <FaChartLine className="modern-text-white" style={{ fontSize: '1.25rem' }} />
+              </div>
+              <div>
+                <h1 className="modern-text-xl modern-font-bold modern-text-gradient">
+                  Nebulynx Research
+                </h1>
+              </div>
+            </div>
 
-      {/* Stats Cards */}
-      <div className="grid grid-3 mb-3">
-        <div className="card">
-          <div className="flex flex-between">
-            <div>
-              <h3 style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
-                Total Notifications
-              </h3>
-              <p style={{ fontSize: '32px', fontWeight: '700', color: '#333' }}>
-                {stats.total_notifications || 0}
-              </p>
-            </div>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-            }}>
-              <FaEye size={20} />
-            </div>
-          </div>
-        </div>
+            {/* Right Side - Navigation and Live Indicator */}
+            <div className="modern-flex modern-items-center modern-space-x-4">
+              {/* Navigation Links */}
+              <div className="modern-flex modern-items-center modern-space-x-4">
+                <Link to="/" className="modern-flex modern-items-center modern-space-x-2 modern-px-4 modern-py-2 modern-rounded-xl modern-bg-white-70 modern-border-white-20 hover:modern-bg-white-90 modern-transition" style={{ textDecoration: 'none' }}>
+                  <FaChartLine className="modern-text-blue-600" size={16} />
+                  <span className="modern-text-gray-700 modern-font-medium">Dashboard</span>
+                </Link>
+                
+                <Link to="/prices" className="modern-flex modern-items-center modern-space-x-2 modern-px-4 modern-py-2 modern-rounded-xl modern-bg-white-70 modern-border-white-20 hover:modern-bg-white-90 modern-transition" style={{ textDecoration: 'none' }}>
+                  <FaChartLine className="modern-text-green-600" size={16} />
+                  <span className="modern-text-gray-700 modern-font-medium">Prices</span>
+                </Link>
+                
+                <Link to="/alerts" className="modern-flex modern-items-center modern-space-x-2 modern-px-4 modern-py-2 modern-rounded-xl modern-bg-white-70 modern-border-white-20 hover:modern-bg-white-90 modern-transition" style={{ textDecoration: 'none' }}>
+                  <FaBell className="modern-text-orange-600" size={16} />
+                  <span className="modern-text-gray-700 modern-font-medium">Alerts</span>
+                </Link>
+              </div>
 
-        <div className="card">
-          <div className="flex flex-between">
-            <div>
-              <h3 style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
-                Success Rate
-              </h3>
-              <p style={{ fontSize: '32px', fontWeight: '700', color: '#28a745' }}>
-                {stats.success_rate || 0}%
-              </p>
-            </div>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #28a745 0%, #20c997 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-            }}>
-              <FaChartBar size={20} />
-            </div>
-          </div>
-        </div>
 
-        <div className="card">
-          <div className="flex flex-between">
-            <div>
-              <h3 style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
-                Unique Assets
-              </h3>
-              <p style={{ fontSize: '32px', fontWeight: '700', color: '#ffc107' }}>
-                {stats.unique_assets || 0}
-              </p>
-            </div>
-            <div style={{
-              width: '48px',
-              height: '48px',
-              borderRadius: '12px',
-              background: 'linear-gradient(135deg, #ffc107 0%, #fd7e14 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'center',
-              color: 'white',
-            }}>
-              <FaChartBar size={20} />
             </div>
           </div>
         </div>
       </div>
 
-      {/* Notifications List */}
-      <div className="card">
-        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '20px' }}>
-          Recent Notifications
-        </h2>
-        
-        {notifications.length === 0 ? (
-          <div className="text-center" style={{ padding: '60px 20px', color: '#666' }}>
-            <FaEye size={64} style={{ marginBottom: '24px', opacity: 0.5 }} />
-            <h3 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '12px', color: '#333' }}>
-              No Notifications Yet
-            </h3>
-            <p style={{ fontSize: '16px', marginBottom: '8px' }}>
-              Notifications will appear here when your price alerts are triggered
-            </p>
-            <p style={{ fontSize: '14px', opacity: 0.8 }}>
-              Create some alerts to start receiving notifications
+      {/* Page Section - Title and Actions */}
+      <div className="modern-header" style={{ background: 'rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
+        <div className="modern-container" style={{ maxWidth: '100%', padding: '0 2rem' }}>
+          <div className="modern-flex modern-flex-between modern-p-4">
+            {/* Page Title */}
+            <div className="modern-flex modern-items-center modern-space-x-3">
+              <div className="modern-icon-bg modern-w-10 modern-h-10 modern-gradient-bg-green">
+                <FaEye className="modern-text-white" style={{ fontSize: '1.25rem' }} />
+              </div>
+              <div>
+                <h2 className="modern-text-xl modern-font-bold modern-text-gray-900">Notifications</h2>
+                <p className="modern-text-sm modern-text-gray-500">View and manage your alerts</p>
+              </div>
+            </div>
+
+            {/* Cleanup Button */}
+            <button
+              onClick={cleanupNotifications}
+              className="modern-button modern-button-secondary"
+            >
+              <FaTrash style={{ marginRight: '0.5rem' }} />
+              Cleanup Old
+            </button>
+          </div>
+        </div>
+      </div>
+
+      {/* Main Content */}
+      <div className="modern-container" style={{ maxWidth: '100%', padding: '0 2rem' }}>
+        <div className="modern-p-6">
+          <div className="modern-mb-6">
+            <p className="modern-text-gray-600 modern-text-lg">
+              View and manage your recent price notifications. Clean up old notifications to keep your dashboard tidy.
             </p>
           </div>
-        ) : (
-          <div style={{ maxHeight: '600px', overflowY: 'auto' }}>
-            {notifications.map((notification) => (
-              <div
-                key={notification.id}
-                className="flex flex-between"
-                style={{
-                  padding: '20px 0',
-                  borderBottom: '1px solid #f0f0f0',
-                }}
-              >
-                <div style={{ flex: 1 }}>
-                  <div className="flex flex-between" style={{ marginBottom: '8px' }}>
-                    <h4 style={{ fontSize: '16px', fontWeight: '600', color: '#333' }}>
-                      {notification.asset_name} Alert Triggered
-                    </h4>
-                    <span className={`badge ${notification.status === 'sent' ? 'badge-success' : 'badge-danger'}`}>
-                      {notification.status}
-                    </span>
+
+          {/* Stats Cards */}
+          <div className="modern-grid modern-grid-3 modern-mb-8">
+            <div className="modern-stats-card">
+              <div className="modern-relative modern-z-10">
+                <div className="modern-flex modern-justify-between modern-mb-4">
+                  <div className="modern-icon-bg">
+                    <FaChartBar style={{ fontSize: '1.5rem' }} />
                   </div>
-                  
-                  <p style={{ fontSize: '14px', color: '#666', marginBottom: '8px' }}>
-                    <strong>Current Price:</strong> {notification.currency} {notification.current_price.toLocaleString()} | 
-                    <strong> Threshold:</strong> {notification.currency} {notification.threshold_price.toLocaleString()} | 
-                    <strong> Condition:</strong> {notification.condition_type.toUpperCase()}
-                  </p>
-                  
-                  <div style={{ fontSize: '12px', color: '#888' }}>
-                    <span>Sent: {new Date(notification.sent_at).toLocaleString()}</span>
-                    {notification.user_name && (
-                      <span style={{ marginLeft: '16px' }}>
-                        User: {notification.user_name}
-                      </span>
-                    )}
+                  <div className="modern-text-right">
+                    <div className="modern-text-3xl modern-font-bold modern-text-gray-900">
+                      {stats.total_notifications || 0}
+                    </div>
+                    <div className="modern-text-sm modern-text-gray-500">Total Notifications</div>
                   </div>
                 </div>
               </div>
-            ))}
-          </div>
-        )}
-      </div>
+            </div>
 
-      {/* Additional Stats */}
-      {stats.total_notifications > 0 && (
-        <div className="card mt-3">
-          <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '16px' }}>
-            Notification Statistics (Last 7 Days)
-          </h3>
-          
-          <div className="grid grid-3">
-            <div className="text-center">
-              <p style={{ fontSize: '24px', fontWeight: '700', color: '#28a745', marginBottom: '4px' }}>
-                {stats.successful_notifications || 0}
-              </p>
-              <p style={{ fontSize: '14px', color: '#666' }}>Successful</p>
-            </div>
-            
-            <div className="text-center">
-              <p style={{ fontSize: '24px', fontWeight: '700', color: '#dc3545', marginBottom: '4px' }}>
-                {stats.failed_notifications || 0}
-              </p>
-              <p style={{ fontSize: '14px', color: '#666' }}>Failed</p>
-            </div>
-            
-            <div className="text-center">
-              <p style={{ fontSize: '24px', fontWeight: '700', color: '#667eea', marginBottom: '4px' }}>
-                {stats.unique_users || 0}
-              </p>
-              <p style={{ fontSize: '14px', color: '#666' }}>Users Notified</p>
-            </div>
-          </div>
-          
-          {stats.first_notification && (
-            <div style={{ marginTop: '16px', paddingTop: '16px', borderTop: '1px solid #f0f0f0' }}>
-              <div className="flex flex-between" style={{ fontSize: '14px', color: '#666' }}>
-                <span>First notification: {new Date(stats.first_notification).toLocaleString()}</span>
-                <span>Last notification: {new Date(stats.last_notification).toLocaleString()}</span>
+            <div className="modern-stats-card">
+              <div className="modern-relative modern-z-10">
+                <div className="modern-flex modern-justify-between modern-mb-4">
+                  <div className="modern-icon-bg">
+                    <FaBell style={{ fontSize: '1.5rem' }} />
+                  </div>
+                  <div className="modern-text-right">
+                    <div className="modern-text-3xl modern-font-bold modern-text-gray-900">
+                      {stats.today_notifications || 0}
+                    </div>
+                    <div className="modern-text-sm modern-text-gray-500">Today</div>
+                  </div>
+                </div>
               </div>
             </div>
-          )}
-        </div>
-      )}
 
-      {/* Info Card */}
-      <div className="card mt-3" style={{ background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)', color: 'white' }}>
-        <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '12px' }}>
-          📧 Notification System
-        </h3>
-        <p style={{ fontSize: '14px', opacity: 0.9, marginBottom: '8px' }}>
-          • Notifications are sent via email when price alerts are triggered
-        </p>
-        <p style={{ fontSize: '14px', opacity: 0.9, marginBottom: '8px' }}>
-          • Each notification includes current price, threshold, and condition details
-        </p>
-        <p style={{ fontSize: '14px', opacity: 0.9 }}>
-          • Failed notifications are logged and can be retried
-        </p>
+            <div className="modern-stats-card">
+              <div className="modern-relative modern-z-10">
+                <div className="modern-flex modern-justify-between modern-mb-4">
+                  <div className="modern-icon-bg">
+                    <FaEye style={{ fontSize: '1.5rem' }} />
+                  </div>
+                  <div className="modern-text-right">
+                    <div className="modern-text-3xl modern-font-bold modern-text-gray-900">
+                      {stats.this_week_notifications || 0}
+                    </div>
+                    <div className="modern-text-sm modern-text-gray-500">This Week</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Notifications List */}
+          <div className="modern-card">
+            <div className="modern-flex modern-justify-between modern-mb-6">
+              <h2 className="modern-text-xl modern-font-bold modern-text-gray-900">Recent Notifications</h2>
+              <div className="modern-text-sm modern-text-gray-500">
+                Showing {notifications.length} notifications
+              </div>
+            </div>
+
+            {notifications.length === 0 ? (
+              <div className="modern-text-center modern-p-8">
+                <FaEye size={64} style={{ marginBottom: '1.5rem', opacity: 0.5, color: '#9ca3af' }} />
+                <h3 className="modern-text-xl modern-font-semibold modern-mb-2 modern-text-gray-900">
+                  No Notifications
+                </h3>
+                <p className="modern-text-gray-600">
+                  You'll see notifications here when your price alerts are triggered.
+                </p>
+              </div>
+            ) : (
+              <div className="modern-space-y-4">
+                {notifications.map((notification) => (
+                  <div key={notification.id} className="modern-bg-gradient-gray modern-rounded-xl modern-p-4 modern-border-gray-200">
+                    <div className="modern-flex modern-justify-between modern-mb-2">
+                      <div className="modern-flex modern-items-center modern-space-x-3">
+                        <div className="modern-icon-bg modern-w-8 modern-h-8 modern-gradient-bg-blue">
+                          <FaBell className="modern-text-white" size={12} />
+                        </div>
+                        <div>
+                          <h4 className="modern-font-semibold modern-text-gray-900">
+                            {notification.asset_name} ({notification.asset_symbol})
+                          </h4>
+                          <p className="modern-text-sm modern-text-gray-600">
+                            Price {notification.condition_type === 'above' ? 'rose above' : 'fell below'} {formatPrice(notification.threshold_price, notification.currency)}
+                          </p>
+                        </div>
+                      </div>
+                      <div className="modern-text-right">
+                        <div className="modern-text-sm modern-text-gray-500">
+                          {new Date(notification.created_at).toLocaleDateString()}
+                        </div>
+                        <div className="modern-text-xs modern-text-gray-400">
+                          {new Date(notification.created_at).toLocaleTimeString()}
+                        </div>
+                      </div>
+                    </div>
+                    
+                    <div className="modern-text-sm modern-text-gray-600">
+                      <p><strong>Current Price:</strong> {formatPrice(notification.current_price, notification.currency)}</p>
+                      <p><strong>Alert Email:</strong> {notification.notification_email}</p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
       </div>
     </div>
   );

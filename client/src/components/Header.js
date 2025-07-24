@@ -47,7 +47,7 @@ const Header = () => {
             <ul style={{
               display: 'flex',
               listStyle: 'none',
-              gap: '8px',
+              gap: '1rem',
               margin: 0,
               padding: 0,
             }}>
@@ -75,7 +75,7 @@ const Header = () => {
                   </Link>
                 </li>
               ))}
-              <li>
+              <li style={{ marginLeft: '0.5rem' }}>
                 <Link
                   to="/alerts/create"
                   className="btn btn-primary"
