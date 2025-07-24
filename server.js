@@ -9,6 +9,7 @@ const { initializeDatabase } = require('./database/database');
 const alertRoutes = require('./routes/alerts');
 const priceRoutes = require('./routes/prices');
 const notificationRoutes = require('./routes/notifications');
+const assetRoutes = require('./routes/assets');
 const { startPriceMonitoring } = require('./services/priceMonitor');
 
 const app = express();
@@ -36,14 +37,15 @@ app.use(express.urlencoded({ extended: true }));
 app.use('/api/alerts', alertRoutes);
 app.use('/api/prices', priceRoutes);
 app.use('/api/notifications', notificationRoutes);
-
-// Serve static files from React build
-app.use(express.static(path.join(__dirname, 'client/build')));
+app.use('/api/assets', assetRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
   res.json({ status: 'OK', message: 'Trading Notification API is running' });
 });
+
+// Serve static files from React build
+app.use(express.static(path.join(__dirname, 'client/build')));
 
 // Catch all handler for React app
 app.get('*', (req, res) => {

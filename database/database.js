@@ -63,6 +63,48 @@ function initializeDatabase() {
         )
       `);
 
+      // Create asset_details table for additional asset information
+      db.run(`
+        CREATE TABLE IF NOT EXISTS asset_details (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          asset_symbol TEXT UNIQUE NOT NULL,
+          asset_name TEXT NOT NULL,
+          market_cap REAL,
+          volume_24h REAL,
+          circulating_supply REAL,
+          total_supply REAL,
+          max_supply REAL,
+          launch_date TEXT,
+          description TEXT,
+          website TEXT,
+          whitepaper TEXT,
+          github TEXT,
+          twitter TEXT,
+          reddit TEXT,
+          last_updated DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
+      // Create price_history_hourly table for detailed price tracking
+      db.run(`
+        CREATE TABLE IF NOT EXISTS price_history_hourly (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          asset_symbol TEXT NOT NULL,
+          asset_name TEXT NOT NULL,
+          currency TEXT NOT NULL,
+          price REAL NOT NULL,
+          volume_24h REAL,
+          market_cap REAL,
+          timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
+        )
+      `);
+
+      // Create indexes for better performance
+      db.run(`CREATE INDEX IF NOT EXISTS idx_price_history_symbol_timestamp ON price_history(asset_symbol, timestamp)`);
+      db.run(`CREATE INDEX IF NOT EXISTS idx_price_history_hourly_symbol_timestamp ON price_history_hourly(asset_symbol, timestamp)`);
+      db.run(`CREATE INDEX IF NOT EXISTS idx_alerts_symbol ON alerts(asset_symbol)`);
+      db.run(`CREATE INDEX IF NOT EXISTS idx_notifications_symbol ON notifications(asset_symbol)`);
+
       db.run("PRAGMA foreign_keys = ON", (err) => {
         if (err) {
           reject(err);

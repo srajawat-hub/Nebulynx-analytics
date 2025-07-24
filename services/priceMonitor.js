@@ -299,8 +299,8 @@ async function savePriceHistory(prices) {
     try {
       await new Promise((resolve, reject) => {
         db.run(
-          'INSERT INTO price_history (asset_symbol, asset_name, currency, price) VALUES (?, ?, ?, ?)',
-          [symbol, data.name, data.currency, data.price],
+          'INSERT INTO price_history (asset_symbol, asset_name, currency, price, timestamp) VALUES (?, ?, ?, ?, ?)',
+          [symbol, data.name, data.currency, data.price, timestamp],
           (err) => {
             if (err) reject(err);
             else resolve();
@@ -310,6 +310,23 @@ async function savePriceHistory(prices) {
     } catch (error) {
       console.error(`Error saving ${symbol} price history:`, error.message);
     }
+  }
+  
+  // Clean up old data (keep only last 90 days)
+  try {
+    const ninetyDaysAgo = new Date(Date.now() - (90 * 24 * 60 * 60 * 1000)).toISOString();
+    await new Promise((resolve, reject) => {
+      db.run(
+        'DELETE FROM price_history WHERE timestamp < ?',
+        [ninetyDaysAgo],
+        (err) => {
+          if (err) reject(err);
+          else resolve();
+        }
+      );
+    });
+  } catch (error) {
+    console.error('Error cleaning up old data:', error.message);
   }
 }
 
