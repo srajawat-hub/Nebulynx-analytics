@@ -165,7 +165,14 @@ const Dashboard = () => {
               >
                 <div>
                   <h4 style={{ fontSize: '16px', fontWeight: '600', marginBottom: '4px' }}>
-                    {data.name} ({symbol})
+                    <Link 
+                      to={`/asset/${symbol}`} 
+                      style={{ color: 'inherit', textDecoration: 'none' }}
+                      onMouseEnter={(e) => e.target.style.color = '#667eea'}
+                      onMouseLeave={(e) => e.target.style.color = 'inherit'}
+                    >
+                      {data.name} ({symbol})
+                    </Link>
                   </h4>
                   <p style={{ fontSize: '14px', color: '#666' }}>
                     {data.currency}

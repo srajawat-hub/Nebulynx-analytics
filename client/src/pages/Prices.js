@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
 import { FaSync, FaChartLine } from 'react-icons/fa';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -89,7 +90,14 @@ const Prices = () => {
             <div className="flex flex-between mb-2">
               <div>
                 <h3 style={{ fontSize: '18px', fontWeight: '600', marginBottom: '4px' }}>
-                  {data.name} ({symbol})
+                  <Link 
+                    to={`/asset/${symbol}`} 
+                    style={{ color: 'inherit', textDecoration: 'none' }}
+                    onMouseEnter={(e) => e.target.style.color = '#667eea'}
+                    onMouseLeave={(e) => e.target.style.color = 'inherit'}
+                  >
+                    {data.name} ({symbol})
+                  </Link>
                 </h3>
                 <p style={{ fontSize: '14px', color: '#666' }}>
                   {data.currency}
@@ -188,7 +196,14 @@ const Prices = () => {
                 }}>
                   <div>
                     <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '2px' }}>
-                      {data.name} ({symbol})
+                      <Link 
+                        to={`/asset/${symbol}`} 
+                        style={{ color: 'inherit', textDecoration: 'none' }}
+                        onMouseEnter={(e) => e.target.style.color = '#667eea'}
+                        onMouseLeave={(e) => e.target.style.color = 'inherit'}
+                      >
+                        {data.name} ({symbol})
+                      </Link>
                     </h4>
                     <p style={{ fontSize: '12px', color: '#666' }}>
                       {data.currency}
@@ -226,7 +241,14 @@ const Prices = () => {
                 }}>
                   <div>
                     <h4 style={{ fontSize: '14px', fontWeight: '600', marginBottom: '2px' }}>
-                      {data.name} ({symbol})
+                      <Link 
+                        to={`/asset/${symbol}`} 
+                        style={{ color: 'inherit', textDecoration: 'none' }}
+                        onMouseEnter={(e) => e.target.style.color = '#667eea'}
+                        onMouseLeave={(e) => e.target.style.color = 'inherit'}
+                      >
+                        {data.name} ({symbol})
+                      </Link>
                     </h4>
                     <p style={{ fontSize: '12px', color: '#666' }}>
                       {data.currency} per 10g
