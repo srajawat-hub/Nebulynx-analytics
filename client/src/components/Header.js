@@ -39,7 +39,7 @@ const Header = () => {
               margin: 0,
               letterSpacing: '1px',
             }}>
-              Nebulatics Research
+              Nebulynx Research
             </h1>
           </Link>
           

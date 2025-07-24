@@ -4,6 +4,7 @@ import { FaArrowLeft, FaGlobe, FaFileAlt, FaGithub, FaTwitter, FaReddit, FaChart
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import CoinLogo from '../components/CoinLogo';
 
 const Asset = () => {
   const { symbol } = useParams();
@@ -112,11 +113,7 @@ const Asset = () => {
     });
   };
 
-  const getPriceChangeClass = () => {
-    // This would normally compare with previous price
-    const classes = ['price-up', 'price-down', 'price-neutral'];
-    return classes[Math.floor(Math.random() * classes.length)];
-  };
+
 
   if (loading) {
     return (
@@ -140,241 +137,547 @@ const Asset = () => {
   return (
     <div>
       {/* Header */}
-      <div className="flex flex-between mb-3">
-        <div>
-          <Link to="/" className="btn btn-secondary" style={{ marginBottom: '16px', display: 'inline-flex', alignItems: 'center' }}>
-            <FaArrowLeft style={{ marginRight: '8px' }} />
-            Back to Dashboard
-          </Link>
-          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#222', marginBottom: '8px' }}>
-            {assetDetails.asset_name} ({symbol})
-          </h1>
-          <p style={{ fontSize: '16px', color: '#666' }}>
-            {assetDetails.description}
-          </p>
-        </div>
+      <div style={{ marginBottom: '32px' }}>
+        <Link 
+          to="/" 
+          className="btn btn-secondary" 
+          style={{ 
+            marginBottom: '24px', 
+            display: 'inline-flex', 
+            alignItems: 'center',
+            padding: '8px 16px',
+            borderRadius: '8px',
+            fontSize: '14px',
+            fontWeight: '500'
+          }}
+        >
+          <FaArrowLeft style={{ marginRight: '8px' }} />
+          Back to Dashboard
+        </Link>
         
-        {currentPrice && (
-          <div className="text-right">
-            <p className={getPriceChangeClass()} style={{ fontSize: '32px', fontWeight: '700', marginBottom: '8px' }}>
-              {currentPrice.currency} {currentPrice.price.toLocaleString()}
-            </p>
-            <p style={{ fontSize: '14px', color: '#666' }}>
-              Live Price
-            </p>
+        <div style={{ 
+          display: 'flex', 
+          alignItems: 'center', 
+          justifyContent: 'space-between',
+          background: 'linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%)',
+          padding: '24px',
+          borderRadius: '16px',
+          color: '#1a1a1a',
+          marginBottom: '24px',
+          border: '1px solid #e2e8f0',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.05)'
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '16px' }}>
+            <CoinLogo symbol={symbol} size={48} />
+            <div>
+              <h1 style={{ 
+                fontSize: '28px', 
+                fontWeight: '700', 
+                marginBottom: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '12px',
+                color: '#1a1a1a'
+              }}>
+                {assetDetails.asset_name}
+                <span style={{ 
+                  fontSize: '16px', 
+                  fontWeight: '500',
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  padding: '4px 12px',
+                  borderRadius: '20px'
+                }}>
+                  {symbol}
+                </span>
+              </h1>
+              <p style={{ 
+                fontSize: '14px', 
+                color: '#666',
+                maxWidth: '400px',
+                lineHeight: '1.4'
+              }}>
+                {assetDetails.description}
+              </p>
+            </div>
           </div>
-        )}
-      </div>
-
-      <div className="grid grid-2">
-        {/* Asset Information */}
-        <div className="card">
-          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>
-            Asset Information
-          </h2>
           
-          <div style={{ display: 'grid', gap: '16px' }}>
-            <div className="flex flex-between">
-              <span style={{ color: '#666' }}>Market Cap:</span>
-              <span style={{ fontWeight: '600' }}>
-                {formatNumber(assetDetails.market_cap)}
-              </span>
-            </div>
-            
-            <div className="flex flex-between">
-              <span style={{ color: '#666' }}>24h Volume:</span>
-              <span style={{ fontWeight: '600' }}>
-                {formatNumber(assetDetails.volume_24h)}
-              </span>
-            </div>
-            
-            <div className="flex flex-between">
-              <span style={{ color: '#666' }}>Circulating Supply:</span>
-              <span style={{ fontWeight: '600' }}>
-                {assetDetails.circulating_supply ? 
-                  `${assetDetails.circulating_supply.toLocaleString()} ${symbol}` : 'N/A'}
-              </span>
-            </div>
-            
-            <div className="flex flex-between">
-              <span style={{ color: '#666' }}>Total Supply:</span>
-              <span style={{ fontWeight: '600' }}>
-                {assetDetails.total_supply ? 
-                  `${assetDetails.total_supply.toLocaleString()} ${symbol}` : 'N/A'}
-              </span>
-            </div>
-            
-            <div className="flex flex-between">
-              <span style={{ color: '#666' }}>Max Supply:</span>
-              <span style={{ fontWeight: '600' }}>
-                {assetDetails.max_supply ? 
-                  `${assetDetails.max_supply.toLocaleString()} ${symbol}` : 'N/A'}
-              </span>
-            </div>
-            
-            <div className="flex flex-between">
-              <span style={{ color: '#666' }}>Launch Date:</span>
-              <span style={{ fontWeight: '600' }}>
-                {formatDate(assetDetails.launch_date)}
-              </span>
-            </div>
-          </div>
-        </div>
-
-        {/* Links */}
-        <div className="card">
-          <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>
-            Links & Resources
-          </h2>
-          
-          <div style={{ display: 'grid', gap: '12px' }}>
-            {assetDetails.website && (
-              <a 
-                href={assetDetails.website} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="btn btn-secondary"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <FaGlobe style={{ marginRight: '8px' }} />
-                Official Website
-              </a>
-            )}
-            
-            {assetDetails.whitepaper && (
-              <a 
-                href={assetDetails.whitepaper} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="btn btn-secondary"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <FaFileAlt style={{ marginRight: '8px' }} />
-                Whitepaper
-              </a>
-            )}
-            
-            {assetDetails.github && (
-              <a 
-                href={assetDetails.github} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="btn btn-secondary"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <FaGithub style={{ marginRight: '8px' }} />
-                GitHub
-              </a>
-            )}
-            
-            {assetDetails.twitter && (
-              <a 
-                href={assetDetails.twitter} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="btn btn-secondary"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <FaTwitter style={{ marginRight: '8px' }} />
-                Twitter
-              </a>
-            )}
-            
-            {assetDetails.reddit && (
-              <a 
-                href={assetDetails.reddit} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="btn btn-secondary"
-                style={{ display: 'flex', alignItems: 'center', justifyContent: 'center' }}
-              >
-                <FaReddit style={{ marginRight: '8px' }} />
-                Reddit
-              </a>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Price Chart */}
-      <div className="card mt-3">
-        <div className="flex flex-between mb-3">
-          <h2 style={{ fontSize: '20px', fontWeight: '600' }}>
-            <FaChartLine style={{ marginRight: '8px' }} />
-            Price History
-          </h2>
-          
-          <div style={{ display: 'flex', gap: '8px' }}>
-            {['24h', '7d', '1m', '3m'].map((period) => (
-              <button
-                key={period}
-                onClick={() => setSelectedPeriod(period)}
-                className={`btn ${selectedPeriod === period ? 'btn-primary' : 'btn-secondary'}`}
-                style={{ fontSize: '12px', padding: '8px 12px' }}
-              >
-                {period}
-              </button>
-            ))}
-          </div>
-        </div>
-        
-        <div style={{ height: '400px' }}>
-          {chartData.length > 0 ? (
-            <ResponsiveContainer width="100%" height="100%">
-              <LineChart data={chartData}>
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis 
-                  dataKey="time" 
-                  tick={{ fontSize: 12 }}
-                  interval="preserveStartEnd"
-                />
-                <YAxis 
-                  tick={{ fontSize: 12 }}
-                  domain={['dataMin - 0.1', 'dataMax + 0.1']}
-                />
-                <Tooltip 
-                  formatter={(value, name, props) => [
-                    `${currentPrice?.currency || 'USD'} ${value.toLocaleString()}`,
-                    'Price'
-                  ]}
-                  labelFormatter={(label, payload) => {
-                    if (payload && payload[0] && payload[0].payload.fullDate) {
-                      return payload[0].payload.fullDate;
-                    }
-                    return `Time: ${label}`;
-                  }}
-                />
-                <Line 
-                  type="monotone" 
-                  dataKey="price" 
-                  stroke="#667eea" 
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 6, fill: '#667eea' }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
-          ) : (
-            <div className="text-center" style={{ padding: '40px 20px', color: '#666' }}>
-              <FaChartLine size={48} style={{ marginBottom: '16px', opacity: 0.5 }} />
-              <p>No price data available for the selected period</p>
+          {currentPrice && (
+            <div style={{ textAlign: 'right' }}>
+              <p style={{ 
+                fontSize: '32px', 
+                fontWeight: '700', 
+                marginBottom: '4px',
+                color: '#1a1a1a'
+              }}>
+                {currentPrice.currency} {currentPrice.price.toLocaleString()}
+              </p>
+              <div style={{ 
+                display: 'flex', 
+                alignItems: 'center', 
+                justifyContent: 'flex-end',
+                gap: '6px',
+                fontSize: '12px',
+                color: '#666'
+              }}>
+                <div style={{ 
+                  width: '6px', 
+                  height: '6px', 
+                  borderRadius: '50%', 
+                  backgroundColor: '#10b981',
+                  animation: 'pulse 2s infinite'
+                }}></div>
+                Live Price
+              </div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Actions */}
-      <div className="card mt-3">
-        <h2 style={{ fontSize: '20px', fontWeight: '600', marginBottom: '16px' }}>
-          Actions
+      <div className="grid grid-2" style={{ gap: '24px', marginBottom: '24px' }}>
+        {/* Asset Information - Smaller */}
+        <div className="card" style={{ 
+          background: 'white',
+          borderRadius: '16px',
+          padding: '20px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+          border: '1px solid #f0f0f0',
+          height: 'fit-content'
+        }}>
+          <h2 style={{ 
+            fontSize: '20px', 
+            fontWeight: '700', 
+            marginBottom: '20px',
+            color: '#1a1a1a',
+            display: 'flex',
+            alignItems: 'center',
+            gap: '10px'
+          }}>
+            <div style={{
+              width: '28px',
+              height: '28px',
+              borderRadius: '8px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              color: 'white',
+              fontSize: '14px'
+            }}>
+              <FaChartLine />
+            </div>
+            Asset Info
+          </h2>
+          
+          <div style={{ display: 'grid', gap: '12px' }}>
+            {[
+              { label: 'Market Cap', value: formatNumber(assetDetails.market_cap), icon: '💰' },
+              { label: '24h Volume', value: formatNumber(assetDetails.volume_24h), icon: '📊' },
+              { label: 'Circulating Supply', value: assetDetails.circulating_supply ? `${assetDetails.circulating_supply.toLocaleString()} ${symbol}` : 'N/A', icon: '🔄' },
+              { label: 'Total Supply', value: assetDetails.total_supply ? `${assetDetails.total_supply.toLocaleString()} ${symbol}` : 'N/A', icon: '📦' },
+              { label: 'Max Supply', value: assetDetails.max_supply ? `${assetDetails.max_supply.toLocaleString()} ${symbol}` : 'N/A', icon: '🏆' },
+              { label: 'Launch Date', value: formatDate(assetDetails.launch_date), icon: '🚀' }
+            ].map((item, index) => (
+              <div key={index} style={{
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                padding: '12px',
+                background: '#f8f9fa',
+                borderRadius: '10px',
+                border: '1px solid #e9ecef'
+              }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                  <span style={{ fontSize: '16px' }}>{item.icon}</span>
+                  <span style={{ color: '#666', fontWeight: '500', fontSize: '14px' }}>{item.label}:</span>
+                </div>
+                <span style={{ 
+                  fontWeight: '700', 
+                  color: '#1a1a1a',
+                  fontSize: '14px'
+                }}>
+                  {item.value}
+                </span>
+              </div>
+            ))}
+          </div>
+        </div>
+
+        {/* Price Chart - Larger */}
+        <div className="card" style={{ 
+          background: 'white',
+          borderRadius: '16px',
+          padding: '20px',
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+          border: '1px solid #f0f0f0'
+        }}>
+          <div style={{ 
+            display: 'flex', 
+            alignItems: 'center', 
+            justifyContent: 'space-between',
+            marginBottom: '20px'
+          }}>
+            <h2 style={{ 
+              fontSize: '20px', 
+              fontWeight: '700',
+              color: '#1a1a1a',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '10px'
+            }}>
+              <div style={{
+                width: '28px',
+                height: '28px',
+                borderRadius: '8px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white',
+                fontSize: '14px'
+              }}>
+                <FaChartLine />
+              </div>
+              Price History
+            </h2>
+            
+            {/* Period Selector */}
+            <div style={{ display: 'flex', gap: '6px' }}>
+              {['24h', '7d', '1m', '3m'].map(period => (
+                <button
+                  key={period}
+                  onClick={() => setSelectedPeriod(period)}
+                  style={{
+                    padding: '8px 16px',
+                    border: 'none',
+                    borderRadius: '10px',
+                    cursor: 'pointer',
+                    fontWeight: '600',
+                    fontSize: '12px',
+                    transition: 'all 0.2s ease',
+                    ...(selectedPeriod === period ? {
+                      background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                      color: 'white',
+                      boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
+                    } : {
+                      backgroundColor: '#f8f9fa',
+                      color: '#666',
+                      border: '1px solid #e9ecef'
+                    })
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedPeriod !== period) {
+                      e.target.style.background = '#e9ecef';
+                      e.target.style.transform = 'translateY(-1px)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedPeriod !== period) {
+                      e.target.style.background = '#f8f9fa';
+                      e.target.style.transform = 'translateY(0)';
+                    }
+                  }}
+                >
+                  {period}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          {loading ? (
+            <div style={{ 
+              textAlign: 'center', 
+              padding: '40px',
+              color: '#666',
+              fontSize: '14px'
+            }}>
+              <div style={{
+                width: '30px',
+                height: '30px',
+                border: '3px solid #f3f3f3',
+                borderTop: '3px solid #667eea',
+                borderRadius: '50%',
+                animation: 'spin 1s linear infinite',
+                margin: '0 auto 12px'
+              }}></div>
+              Loading chart data...
+            </div>
+          ) : (
+            <div style={{ 
+              background: '#fafbfc',
+              borderRadius: '10px',
+              padding: '16px',
+              border: '1px solid #e9ecef'
+            }}>
+              {chartData.length > 0 ? (
+                <ResponsiveContainer width="100%" height={350}>
+                  <LineChart data={chartData}>
+                    <CartesianGrid strokeDasharray="3 3" stroke="#e9ecef" />
+                    <XAxis 
+                      dataKey="time" 
+                      tick={{ fontSize: 0 }}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <YAxis 
+                      tick={{ fontSize: 12, fill: '#666' }}
+                      domain={['dataMin - 0.1', 'dataMax + 0.1']}
+                      axisLine={false}
+                      tickLine={false}
+                    />
+                    <Tooltip 
+                      contentStyle={{
+                        backgroundColor: 'rgba(255, 255, 255, 0.98)',
+                        border: 'none',
+                        borderRadius: '12px',
+                        boxShadow: '0 8px 32px rgba(0, 0, 0, 0.12)',
+                        padding: '16px 20px',
+                        fontSize: '14px',
+                        fontFamily: 'Inter, sans-serif',
+                        backdropFilter: 'blur(10px)'
+                      }}
+                      formatter={(value, name, props) => [
+                        <span style={{ 
+                          color: '#667eea', 
+                          fontWeight: '700',
+                          fontSize: '18px'
+                        }}>
+                          {currentPrice?.currency || 'USD'} {value.toLocaleString()}
+                        </span>,
+                        'Price'
+                      ]}
+                      labelFormatter={(label, payload) => {
+                        if (payload && payload[0] && payload[0].payload.fullDate) {
+                          return (
+                            <span style={{ 
+                              color: '#333', 
+                              fontWeight: '600',
+                              fontSize: '16px'
+                            }}>
+                              {payload[0].payload.fullDate}
+                            </span>
+                          );
+                        }
+                        return `Time: ${label}`;
+                      }}
+                    />
+                    <Line 
+                      type="monotone" 
+                      dataKey="price" 
+                      stroke="url(#gradient)"
+                      strokeWidth={3}
+                      dot={false}
+                      activeDot={{ 
+                        r: 8, 
+                        fill: '#667eea',
+                        stroke: 'white',
+                        strokeWidth: 2
+                      }}
+                    />
+                    <defs>
+                      <linearGradient id="gradient" x1="0" y1="0" x2="0" y2="1">
+                        <stop offset="0%" stopColor="#667eea" stopOpacity={1} />
+                        <stop offset="100%" stopColor="#764ba2" stopOpacity={0.8} />
+                      </linearGradient>
+                    </defs>
+                  </LineChart>
+                </ResponsiveContainer>
+              ) : (
+                <div style={{ 
+                  textAlign: 'center', 
+                  padding: '40px',
+                  color: '#666',
+                  fontSize: '14px'
+                }}>
+                  <FaChartLine size={40} style={{ marginBottom: '12px', opacity: 0.5 }} />
+                  <p>No price data available for the selected period</p>
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Links Section */}
+      <div className="card" style={{ 
+        background: 'white',
+        borderRadius: '16px',
+        padding: '20px',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+        border: '1px solid #f0f0f0',
+        marginBottom: '24px'
+      }}>
+        <h2 style={{ 
+          fontSize: '20px', 
+          fontWeight: '700', 
+          marginBottom: '20px',
+          color: '#1a1a1a',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '10px'
+        }}>
+          <div style={{
+            width: '28px',
+            height: '28px',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontSize: '14px'
+          }}>
+            <FaGlobe />
+          </div>
+          Links & Resources
         </h2>
         
-        <div style={{ display: 'flex', gap: '16px' }}>
-          <Link to="/alerts/create" className="btn btn-primary">
-            Create Alert for {symbol}
+        <div style={{ display: 'grid', gap: '12px', gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))' }}>
+          {[
+            { icon: <FaGlobe />, label: 'Official Website', url: assetDetails.website, color: '#3b82f6' },
+            { icon: <FaFileAlt />, label: 'Whitepaper', url: assetDetails.whitepaper, color: '#10b981' },
+            { icon: <FaGithub />, label: 'GitHub', url: assetDetails.github, color: '#1f2937' },
+            { icon: <FaTwitter />, label: 'Twitter', url: assetDetails.twitter, color: '#1da1f2' },
+            { icon: <FaReddit />, label: 'Reddit', url: assetDetails.reddit, color: '#ff4500' }
+          ].map((link, index) => (
+            link.url && (
+              <a 
+                key={index}
+                href={link.url} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '10px',
+                  padding: '12px',
+                  background: '#f8f9fa',
+                  borderRadius: '10px',
+                  border: '1px solid #e9ecef',
+                  textDecoration: 'none',
+                  color: '#1a1a1a',
+                  fontWeight: '500',
+                  fontSize: '14px',
+                  transition: 'all 0.2s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.background = '#e9ecef';
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.background = '#f8f9fa';
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = 'none';
+                }}
+              >
+                <div style={{
+                  width: '24px',
+                  height: '24px',
+                  borderRadius: '6px',
+                  background: link.color,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white',
+                  fontSize: '12px'
+                }}>
+                  {link.icon}
+                </div>
+                {link.label}
+              </a>
+            )
+          ))}
+        </div>
+      </div>
+
+      {/* Actions */}
+      <div className="card" style={{ 
+        background: 'white',
+        borderRadius: '16px',
+        padding: '24px',
+        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.08)',
+        border: '1px solid #f0f0f0'
+      }}>
+        <h2 style={{ 
+          fontSize: '24px', 
+          fontWeight: '700',
+          marginBottom: '24px',
+          color: '#1a1a1a',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '12px'
+        }}>
+          <div style={{
+            width: '32px',
+            height: '32px',
+            borderRadius: '8px',
+            background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+            color: 'white',
+            fontSize: '16px'
+          }}>
+            ⚡
+          </div>
+          Quick Actions
+        </h2>
+        
+        <div style={{ display: 'flex', gap: '16px', flexWrap: 'wrap' }}>
+          <Link 
+            to="/alerts/create" 
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '16px 24px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              color: 'white',
+              textDecoration: 'none',
+              borderRadius: '12px',
+              fontWeight: '600',
+              fontSize: '16px',
+              transition: 'all 0.2s ease',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.transform = 'translateY(-2px)';
+              e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.transform = 'translateY(0)';
+              e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+            }}
+          >
+            🔔 Create Alert for {symbol}
           </Link>
-          <Link to="/prices" className="btn btn-secondary">
-            View All Prices
+          <Link 
+            to="/prices" 
+            style={{
+              display: 'inline-flex',
+              alignItems: 'center',
+              gap: '8px',
+              padding: '16px 24px',
+              background: '#f8f9fa',
+              color: '#1a1a1a',
+              textDecoration: 'none',
+              borderRadius: '12px',
+              fontWeight: '600',
+              fontSize: '16px',
+              border: '1px solid #e9ecef',
+              transition: 'all 0.2s ease'
+            }}
+            onMouseEnter={(e) => {
+              e.target.style.background = '#e9ecef';
+              e.target.style.transform = 'translateY(-2px)';
+            }}
+            onMouseLeave={(e) => {
+              e.target.style.background = '#f8f9fa';
+              e.target.style.transform = 'translateY(0)';
+            }}
+          >
+            📊 View All Prices
           </Link>
         </div>
       </div>

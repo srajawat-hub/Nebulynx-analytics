@@ -54,7 +54,7 @@ const Dashboard = () => {
     <div>
       <div className="flex flex-between mb-3">
         <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#222', marginBottom: '0' }}>
-          Nebulatics Research Dashboard
+          Dashboard
         </h1>
         <Link to="/alerts/create" className="btn btn-primary">
           <FaPlus style={{ marginRight: '8px' }} />
@@ -62,7 +62,7 @@ const Dashboard = () => {
         </Link>
       </div>
       <p style={{ fontSize: '16px', color: '#444', marginBottom: '24px' }}>
-        Welcome to Nebulatics Research! Track real-time prices for gold and top cryptocurrencies, set custom alerts, and receive instant notifications. Explore your dashboard below.
+        Welcome to Nebulynx Research! Track real-time prices for gold and top cryptocurrencies, set custom alerts, and receive instant notifications. Explore your dashboard below.
       </p>
 
       {/* Stats Cards */}
