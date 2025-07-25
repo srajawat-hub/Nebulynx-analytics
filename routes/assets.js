@@ -74,11 +74,25 @@ router.get('/', (req, res) => {
 // Update all asset details (admin endpoint)
 router.post('/update-details', async (req, res) => {
   try {
+    console.log('🔄 Updating all asset details from API...');
     await updateAllAssetDetails();
     res.json({ message: 'Asset details updated successfully' });
   } catch (error) {
     console.error('Error updating asset details:', error);
     res.status(500).json({ error: 'Failed to update asset details' });
+  }
+});
+
+// Force refresh asset details with real data
+router.post('/refresh-data', async (req, res) => {
+  try {
+    console.log('🔄 Force refreshing asset data with real market information...');
+    const { populateAssetDetails } = require('../scripts/populateAssetDetails');
+    await populateAssetDetails();
+    res.json({ message: 'Asset data refreshed successfully with real market data' });
+  } catch (error) {
+    console.error('Error refreshing asset data:', error);
+    res.status(500).json({ error: 'Failed to refresh asset data' });
   }
 });
 
