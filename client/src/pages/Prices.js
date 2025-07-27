@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaSync, FaChartLine, FaArrowRight, FaCaretUp, FaCaretDown, FaMinus, FaFilter, FaSearch, FaBell, FaEye } from 'react-icons/fa';
+import { FaSync, FaChartLine, FaArrowRight, FaCaretUp, FaCaretDown, FaMinus, FaFilter, FaSearch, FaBell, FaEye, FaArrowLeft } from 'react-icons/fa';
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import CoinLogo from '../components/CoinLogo';
+import FavoriteButton from '../components/FavoriteButton';
+import Header from '../components/Header';
 
 const Prices = () => {
   const [prices, setPrices] = useState({});
@@ -94,106 +96,171 @@ const Prices = () => {
 
   return (
     <div className="modern-min-h-screen modern-bg-gradient">
-      {/* Main Header - Logo and Navigation */}
-      <div className="modern-header" style={{ borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-        <div className="modern-container" style={{ maxWidth: '100%', padding: '0 2rem' }}>
-          <div className="modern-flex modern-flex-between modern-p-4">
-            {/* Left Side - Logo */}
-            <div className="modern-flex modern-items-center modern-space-x-3">
-              <div className="modern-icon-bg modern-w-10 modern-h-10 modern-gradient-bg-blue">
-                <FaChartLine className="modern-text-white" style={{ fontSize: '1.25rem' }} />
-              </div>
-              <div>
-                <h1 className="modern-text-xl modern-font-bold modern-text-gradient">
-                  Nebulynx Research
-                </h1>
-              </div>
-            </div>
-
-            {/* Right Side - Navigation and Live Indicator */}
-            <div className="modern-flex modern-items-center modern-space-x-4">
-              {/* Navigation Links */}
-              <div className="modern-flex modern-items-center modern-space-x-4">
-                <Link to="/" className="modern-flex modern-items-center modern-space-x-2 modern-px-4 modern-py-2 modern-rounded-xl modern-bg-white-70 modern-border-white-20 hover:modern-bg-white-90 modern-transition" style={{ textDecoration: 'none' }}>
-                  <FaChartLine className="modern-text-blue-600" size={16} />
-                  <span className="modern-text-gray-700 modern-font-medium">Dashboard</span>
-                </Link>
-                
-                <Link to="/alerts" className="modern-flex modern-items-center modern-space-x-2 modern-px-4 modern-py-2 modern-rounded-xl modern-bg-white-70 modern-border-white-20 hover:modern-bg-white-90 modern-transition" style={{ textDecoration: 'none' }}>
-                  <FaBell className="modern-text-orange-600" size={16} />
-                  <span className="modern-text-gray-700 modern-font-medium">Alerts</span>
-                </Link>
-                
-                <Link to="/notifications" className="modern-flex modern-items-center modern-space-x-2 modern-px-4 modern-py-2 modern-rounded-xl modern-bg-white-70 modern-border-white-20 hover:modern-bg-white-90 modern-transition" style={{ textDecoration: 'none' }}>
-                  <FaEye className="modern-text-green-600" size={16} />
-                  <span className="modern-text-gray-700 modern-font-medium">Notifications</span>
-                </Link>
-              </div>
-
-
-            </div>
-          </div>
-        </div>
-      </div>
-
-      {/* Page Section - Title and Actions */}
-      <div className="modern-header" style={{ background: 'rgba(255, 255, 255, 0.05)', backdropFilter: 'blur(10px)', borderBottom: '1px solid rgba(255, 255, 255, 0.1)' }}>
-        <div className="modern-container" style={{ maxWidth: '100%', padding: '0 2rem' }}>
-          <div className="modern-flex modern-flex-between modern-p-4">
-            {/* Page Title */}
-            <div className="modern-flex modern-items-center modern-space-x-3">
-              <div className="modern-icon-bg modern-w-10 modern-h-10 modern-gradient-bg-green">
-                <FaChartLine className="modern-text-white" style={{ fontSize: '1.25rem' }} />
-              </div>
-              <div>
-                <h2 className="modern-text-xl modern-font-bold modern-text-gray-900">Live Prices</h2>
-                <p className="modern-text-sm modern-text-gray-500">Real-time market data</p>
-              </div>
-            </div>
-
-            {/* Refresh Button */}
-            <button
-              onClick={fetchPrices}
-              disabled={refreshing}
-              className="modern-button modern-button-secondary"
-              style={{ 
-                opacity: refreshing ? 0.5 : 1, 
-                cursor: refreshing ? 'not-allowed' : 'pointer'
-              }}
-            >
-              <FaSync style={{ marginRight: '0.5rem' }} className={refreshing ? 'modern-spinner' : ''} />
-              {refreshing ? 'Refreshing...' : 'Refresh'}
-            </button>
-          </div>
-        </div>
-      </div>
+      <Header />
 
       {/* Main Content */}
       <div className="modern-container" style={{ maxWidth: '100%', padding: '0 2rem' }}>
         <div className="modern-p-6">
-          {/* Category Filter */}
+          {/* Back Button and Page Header */}
           <div className="modern-mb-8">
-            <div className="modern-flex modern-items-center modern-space-x-4 modern-mb-4">
-              <FaFilter className="modern-text-gray-600" />
-              <h2 className="modern-text-lg modern-font-semibold modern-text-gray-900">Filter by Category</h2>
+            <Link 
+              to="/" 
+              className="modern-flex modern-items-center modern-space-x-3 modern-px-6 modern-py-3 modern-rounded-xl modern-font-semibold modern-transition" 
+              style={{ 
+                textDecoration: 'none',
+                background: 'rgba(102, 126, 234, 0.1)',
+                backdropFilter: 'blur(10px)',
+                border: '1px solid rgba(102, 126, 234, 0.3)',
+                boxShadow: '0 4px 12px rgba(102, 126, 234, 0.2)',
+                width: 'fit-content',
+                marginBottom: '24px',
+                color: '#667eea'
+              }}
+              onMouseEnter={(e) => {
+                e.target.style.transform = 'translateY(-2px)';
+                e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.3)';
+                e.target.style.background = 'rgba(102, 126, 234, 0.15)';
+              }}
+              onMouseLeave={(e) => {
+                e.target.style.transform = 'translateY(0)';
+                e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.2)';
+                e.target.style.background = 'rgba(102, 126, 234, 0.1)';
+              }}
+            >
+              <FaArrowLeft size={16} />
+              <span>Back to Dashboard</span>
+            </Link>
+            
+            {/* Page Header Card */}
+            <div className="modern-card" style={{ 
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '1.5rem',
+              padding: '2.5rem',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+              marginBottom: '2rem'
+            }}>
+              <div className="modern-flex modern-items-center modern-justify-between">
+                <div className="modern-flex modern-items-center" style={{ gap: '2rem' }}>
+                  <div className="modern-icon-bg" style={{
+                    width: '80px',
+                    height: '80px',
+                    borderRadius: '20px',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center',
+                    color: 'white',
+                    boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)'
+                  }}>
+                    <FaChartLine size={40} />
+                  </div>
+                  <div>
+                    <h1 className="modern-text-3xl modern-font-bold modern-text-gray-900 modern-mb-3">
+                      Live Market Prices
+                    </h1>
+                    <p className="modern-text-gray-600 modern-text-lg" style={{ maxWidth: '600px', lineHeight: '1.6' }}>
+                      Real-time cryptocurrency and commodity prices with live market data and price tracking
+                    </p>
+                  </div>
+                </div>
+                
+                {/* Refresh Button */}
+                <button
+                  onClick={fetchPrices}
+                  disabled={refreshing}
+                  className="modern-flex modern-items-center modern-space-x-2 modern-px-6 modern-py-3 modern-rounded-xl modern-font-semibold modern-transition"
+                  style={{
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                    border: 'none',
+                    opacity: refreshing ? 0.7 : 1,
+                    cursor: refreshing ? 'not-allowed' : 'pointer'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (!refreshing) {
+                      e.target.style.transform = 'translateY(-2px)';
+                      e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (!refreshing) {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+                    }
+                  }}
+                >
+                  <FaSync className={refreshing ? 'modern-spinner' : ''} size={16} />
+                  <span>{refreshing ? 'Refreshing...' : 'Refresh'}</span>
+                </button>
+              </div>
             </div>
-            <div className="modern-flex modern-space-x-3" style={{ flexWrap: 'wrap' }}>
+          </div>
+
+          {/* Category Filter */}
+          <div className="modern-card modern-mb-8" style={{ 
+            background: 'rgba(255, 255, 255, 0.9)',
+            backdropFilter: 'blur(10px)',
+            border: '1px solid rgba(255, 255, 255, 0.3)',
+            borderRadius: '1.5rem',
+            padding: '2rem',
+            boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+          }}>
+            <div className="modern-flex modern-items-center modern-space-x-4 modern-mb-6">
+              <div className="modern-icon-bg" style={{
+                width: '48px',
+                height: '48px',
+                borderRadius: '14px',
+                background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                color: 'white'
+              }}>
+                <FaFilter size={24} />
+              </div>
+              <h2 className="modern-text-xl modern-font-bold modern-text-gray-900">Filter by Category</h2>
+            </div>
+            <div className="modern-flex modern-space-x-4" style={{ flexWrap: 'wrap', gap: '1rem' }}>
               {categories.map((category) => (
                 <button
                   key={category.id}
                   onClick={() => setSelectedCategory(category.id)}
-                  className={`modern-button ${selectedCategory === category.id ? 'modern-gradient-bg' : 'modern-bg-white-70 modern-border-white-20'}`}
+                  className="modern-px-6 modern-py-3 modern-rounded-xl modern-font-semibold modern-transition"
                   style={{ 
-                    background: selectedCategory === category.id ? 'linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%)' : 'rgba(255, 255, 255, 0.7)',
+                    background: selectedCategory === category.id 
+                      ? 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)' 
+                      : 'rgba(255, 255, 255, 0.8)',
                     color: selectedCategory === category.id ? 'white' : '#374151',
-                    border: selectedCategory === category.id ? 'none' : '1px solid rgba(255, 255, 255, 0.2)'
+                    border: selectedCategory === category.id ? 'none' : '1px solid rgba(255, 255, 255, 0.3)',
+                    boxShadow: selectedCategory === category.id 
+                      ? '0 4px 12px rgba(102, 126, 234, 0.3)' 
+                      : '0 2px 8px rgba(0, 0, 0, 0.05)'
+                  }}
+                  onMouseEnter={(e) => {
+                    if (selectedCategory !== category.id) {
+                      e.target.style.transform = 'translateY(-1px)';
+                      e.target.style.boxShadow = '0 4px 12px rgba(0, 0, 0, 0.1)';
+                    }
+                  }}
+                  onMouseLeave={(e) => {
+                    if (selectedCategory !== category.id) {
+                      e.target.style.transform = 'translateY(0)';
+                      e.target.style.boxShadow = '0 2px 8px rgba(0, 0, 0, 0.05)';
+                    }
                   }}
                 >
                   {category.name}
-                  <span className="modern-badge modern-badge-white" style={{ 
-                    marginLeft: '0.5rem',
+                  <span className="modern-badge" style={{ 
+                    marginLeft: '0.75rem',
                     background: selectedCategory === category.id ? 'rgba(255, 255, 255, 0.2)' : 'rgba(107, 114, 128, 0.1)',
-                    color: selectedCategory === category.id ? 'white' : '#4b5563'
+                    color: selectedCategory === category.id ? 'white' : '#4b5563',
+                    padding: '0.25rem 0.75rem',
+                    borderRadius: '12px',
+                    fontSize: '0.875rem',
+                    fontWeight: '600'
                   }}>
                     {category.count}
                   </span>
@@ -203,57 +270,93 @@ const Prices = () => {
           </div>
 
           {/* Price Cards Grid */}
-          <div className="modern-grid" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(300px, 1fr))', gap: '1.5rem' }}>
+          <div className="modern-grid" style={{ 
+            gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))', 
+            gap: '2rem',
+            marginBottom: '2rem'
+          }}>
             {filteredPrices.map(([symbol, data]) => (
               <div
                 key={symbol}
-                className="modern-price-card"
+                className="modern-card"
                 onClick={() => navigate(`/asset/${symbol}`)}
-                style={{ cursor: 'pointer', textDecoration: 'none' }}
+                style={{ 
+                  cursor: 'pointer', 
+                  textDecoration: 'none',
+                  background: 'rgba(255, 255, 255, 0.9)',
+                  backdropFilter: 'blur(10px)',
+                  border: '1px solid rgba(255, 255, 255, 0.3)',
+                  borderRadius: '1.5rem',
+                  padding: '2rem',
+                  boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)',
+                  transition: 'all 0.3s ease'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-4px)';
+                  e.target.style.boxShadow = '0 12px 40px rgba(0, 0, 0, 0.15)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 8px 32px rgba(0, 0, 0, 0.1)';
+                }}
               >
                 <div className="modern-relative modern-z-10">
                   {/* Header */}
-                  <div className="modern-flex modern-justify-between modern-mb-4">
-                    <div className="modern-flex modern-items-center modern-space-x-3">
-                      <CoinLogo symbol={symbol} size={40} />
+                  <div className="modern-flex modern-justify-between modern-mb-6">
+                    <div className="modern-flex modern-items-center" style={{ gap: '1rem' }}>
+                      <CoinLogo symbol={symbol} size={48} />
                       <div>
-                        <h3 className="modern-font-bold modern-text-gray-900" style={{ textDecoration: 'none' }}>
+                        <h3 className="modern-text-xl modern-font-bold modern-text-gray-900 modern-mb-1">
                           {data.name}
                         </h3>
-                        <p className="modern-text-sm modern-text-gray-500">{symbol}</p>
+                        <p className="modern-text-gray-500 modern-font-medium">{symbol}</p>
                       </div>
                     </div>
-                    <div className={`modern-badge ${
-                      getAssetCategory(symbol) === 'commodity' 
-                        ? 'modern-badge-commodity' 
-                        : 'modern-badge-crypto'
-                    }`}>
-                      {getAssetCategory(symbol) === 'commodity' ? 'Commodity' : 'Crypto'}
+                    <div className="modern-flex modern-items-center" style={{ gap: '0.5rem' }}>
+                      <div 
+                        onClick={(e) => {
+                          e.stopPropagation(); // Prevent card click
+                        }}
+                      >
+                        <FavoriteButton symbol={symbol} size={24} />
+                      </div>
+                      <div className="modern-badge" style={{
+                        background: getAssetCategory(symbol) === 'commodity' 
+                          ? 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)'
+                          : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                        color: 'white',
+                        padding: '0.5rem 1rem',
+                        borderRadius: '20px',
+                        fontSize: '0.875rem',
+                        fontWeight: '600'
+                      }}>
+                        {getAssetCategory(symbol) === 'commodity' ? 'Commodity' : 'Crypto'}
+                      </div>
                     </div>
                   </div>
 
                   {/* Price */}
-                  <div className="modern-mb-4">
-                    <div className="modern-text-2xl modern-font-bold modern-text-gray-900 modern-mb-1" style={{ textDecoration: 'none' }}>
+                  <div className="modern-mb-6">
+                    <div className="modern-text-3xl modern-font-bold modern-text-gray-900 modern-mb-2">
                       {formatPrice(data.price, data.currency)}
                     </div>
-                    <div className={`modern-flex modern-items-center modern-text-sm ${
+                    <div className={`modern-flex modern-items-center modern-text-sm modern-font-semibold ${
                       getPriceChangeClass(symbol) === 'up' ? 'modern-text-green-600' : 
                       getPriceChangeClass(symbol) === 'down' ? 'modern-text-red-600' : 'modern-text-gray-500'
                     }`}>
                       {getPriceChangeIcon(symbol)}
-                      <span style={{ marginLeft: '0.25rem' }}>+2.4%</span>
-                      <span style={{ marginLeft: '0.5rem' }} className="modern-text-gray-400">24h</span>
+                      <span style={{ marginLeft: '0.5rem' }}>+2.4%</span>
+                      <span style={{ marginLeft: '0.75rem' }} className="modern-text-gray-400">24h</span>
                     </div>
                   </div>
 
                   {/* Live indicator */}
-                  <div className="modern-flex modern-justify-between">
-                    <div className="modern-flex modern-items-center modern-space-x-2 modern-text-xs modern-text-gray-500">
+                  <div className="modern-flex modern-justify-between modern-items-center">
+                    <div className="modern-flex modern-items-center" style={{ gap: '0.5rem' }}>
                       <div className="modern-live-indicator"></div>
-                      <span>Live</span>
+                      <span className="modern-text-sm modern-text-gray-500 modern-font-medium">Live</span>
                     </div>
-                    <FaArrowRight className="modern-text-gray-400 modern-transform-hover" />
+                    <FaArrowRight className="modern-text-gray-400" size={16} />
                   </div>
                 </div>
               </div>
@@ -262,15 +365,40 @@ const Prices = () => {
 
           {/* Empty state */}
           {filteredPrices.length === 0 && (
-            <div className="modern-text-center" style={{ padding: '4rem 0' }}>
-              <div className="modern-w-24 modern-h-24 modern-bg-gradient-gray modern-rounded-2xl modern-flex modern-items-center modern-justify-center" style={{ margin: '0 auto 1.5rem' }}>
+            <div className="modern-card modern-text-center" style={{ 
+              padding: '4rem 2rem',
+              background: 'rgba(255, 255, 255, 0.9)',
+              backdropFilter: 'blur(10px)',
+              border: '1px solid rgba(255, 255, 255, 0.3)',
+              borderRadius: '1.5rem',
+              boxShadow: '0 8px 32px rgba(0, 0, 0, 0.1)'
+            }}>
+              <div className="modern-w-24 modern-h-24 modern-bg-gradient-gray modern-rounded-2xl modern-flex modern-items-center modern-justify-center" style={{ 
+                margin: '0 auto 1.5rem',
+                background: 'linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%)',
+                border: '1px solid #e2e8f0'
+              }}>
                 <FaSearch style={{ fontSize: '2.5rem', color: '#9ca3af' }} />
               </div>
               <h3 className="modern-text-xl modern-font-semibold modern-text-gray-900 modern-mb-2">No assets found</h3>
               <p className="modern-text-gray-500 modern-mb-6">Try selecting a different category or check back later.</p>
               <button
                 onClick={() => setSelectedCategory('all')}
-                className="modern-button"
+                className="modern-px-6 modern-py-3 modern-rounded-xl modern-font-semibold modern-transition"
+                style={{
+                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                  color: 'white',
+                  boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                  border: 'none'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
+                }}
               >
                 View All Assets
               </button>
@@ -278,11 +406,26 @@ const Prices = () => {
           )}
 
           {/* Market Summary */}
-          <div className="modern-mt-12 modern-grid modern-grid-3">
-            <div className="modern-card modern-gradient-bg">
+          <div className="modern-grid modern-grid-3" style={{ gap: '2rem' }}>
+            <div className="modern-card" style={{
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderRadius: '1.5rem',
+              padding: '2rem',
+              boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)',
+              color: 'white'
+            }}>
               <div className="modern-flex modern-justify-between modern-mb-4">
-                <div className="modern-icon-bg-white modern-rounded-xl modern-p-3">
-                  <FaChartLine style={{ fontSize: '1.5rem' }} />
+                <div className="modern-icon-bg" style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '16px',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white'
+                }}>
+                  <FaChartLine size={28} />
                 </div>
                 <div className="modern-text-right">
                   <div className="modern-text-3xl modern-font-bold">{Object.keys(prices).length}</div>
@@ -292,10 +435,25 @@ const Prices = () => {
               <p className="modern-text-blue-100 modern-text-sm">Monitoring real-time prices across multiple markets</p>
             </div>
 
-            <div className="modern-card modern-gradient-bg-green">
+            <div className="modern-card" style={{
+              background: 'linear-gradient(135deg, #10b981 0%, #059669 100%)',
+              borderRadius: '1.5rem',
+              padding: '2rem',
+              boxShadow: '0 8px 32px rgba(16, 185, 129, 0.3)',
+              color: 'white'
+            }}>
               <div className="modern-flex modern-justify-between modern-mb-4">
-                <div className="modern-icon-bg-white modern-rounded-xl modern-p-3">
-                  <FaCaretUp style={{ fontSize: '1.5rem' }} />
+                <div className="modern-icon-bg" style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '16px',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white'
+                }}>
+                  <FaCaretUp size={28} />
                 </div>
                 <div className="modern-text-right">
                   <div className="modern-text-3xl modern-font-bold">8</div>
@@ -305,10 +463,25 @@ const Prices = () => {
               <p className="modern-text-green-100 modern-text-sm">Assets showing positive price movement today</p>
             </div>
 
-            <div className="modern-card modern-gradient-bg-orange">
+            <div className="modern-card" style={{
+              background: 'linear-gradient(135deg, #f59e0b 0%, #d97706 100%)',
+              borderRadius: '1.5rem',
+              padding: '2rem',
+              boxShadow: '0 8px 32px rgba(245, 158, 11, 0.3)',
+              color: 'white'
+            }}>
               <div className="modern-flex modern-justify-between modern-mb-4">
-                <div className="modern-icon-bg-white modern-rounded-xl modern-p-3">
-                  <FaCaretDown style={{ fontSize: '1.5rem' }} />
+                <div className="modern-icon-bg" style={{
+                  width: '56px',
+                  height: '56px',
+                  borderRadius: '16px',
+                  background: 'rgba(255, 255, 255, 0.2)',
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  color: 'white'
+                }}>
+                  <FaCaretDown size={28} />
                 </div>
                 <div className="modern-text-right">
                   <div className="modern-text-3xl modern-font-bold">2</div>

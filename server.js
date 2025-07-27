@@ -10,10 +10,11 @@ const alertRoutes = require('./routes/alerts');
 const priceRoutes = require('./routes/prices');
 const notificationRoutes = require('./routes/notifications');
 const assetRoutes = require('./routes/assets');
+const favoritesRoutes = require('./routes/favorites');
 const { startPriceMonitoring } = require('./services/priceMonitor');
 
 const app = express();
-const PORT = process.env.PORT || 3001;
+const PORT = process.env.PORT || 3004;
 
 // Security middleware
 app.use(helmet());
@@ -38,6 +39,7 @@ app.use('/api/alerts', alertRoutes);
 app.use('/api/prices', priceRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/assets', assetRoutes);
+app.use('/api/favorites', favoritesRoutes);
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {

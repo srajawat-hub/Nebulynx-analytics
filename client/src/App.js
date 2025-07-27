@@ -6,6 +6,7 @@ import Prices from './pages/Prices';
 import Notifications from './pages/Notifications';
 import CreateAlert from './pages/CreateAlert';
 import Asset from './pages/Asset';
+import Favorites from './pages/Favorites';
 
 function App() {
   return (
@@ -16,6 +17,7 @@ function App() {
         <Route path="/alerts/create" element={<CreateAlert />} />
         <Route path="/prices" element={<Prices />} />
         <Route path="/notifications" element={<Notifications />} />
+        <Route path="/favorites" element={<Favorites />} />
         <Route path="/asset/:symbol" element={<Asset />} />
       </Routes>
     </div>

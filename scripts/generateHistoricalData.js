@@ -1,10 +1,30 @@
 const { getDatabase } = require('../database/database');
 const { initializeDatabase } = require('../database/database');
 
-// Generate realistic price variations
-function generatePriceVariation(basePrice, volatility = 0.05) {
-  const change = (Math.random() - 0.5) * 2 * volatility;
-  return basePrice * (1 + change);
+// Generate realistic price variations with trend
+function generatePriceVariation(basePrice, volatility = 0.05, trend = 0) {
+  const randomChange = (Math.random() - 0.5) * 2 * volatility;
+  const trendChange = trend * 0.001; // Small trend component
+  return basePrice * (1 + randomChange + trendChange);
+}
+
+// Generate realistic price movements for Tokamak Network TON
+function generateTONPriceMovement(currentPrice, hourIndex, totalHours) {
+  // Create a realistic price trend for TON over 3 months
+  const progress = hourIndex / totalHours;
+  
+  // Start from a lower price and trend upward with some volatility
+  const baseTrend = 0.0001; // Slight upward trend
+  const volatility = 0.03; // 3% volatility
+  
+  // Add some market cycles
+  const cycle1 = Math.sin(progress * Math.PI * 2) * 0.1; // First cycle
+  const cycle2 = Math.sin(progress * Math.PI * 4) * 0.05; // Second cycle
+  
+  const trend = baseTrend + cycle1 + cycle2;
+  const randomChange = (Math.random() - 0.5) * 2 * volatility;
+  
+  return currentPrice * (1 + randomChange + trend);
 }
 
 // Generate historical data for the past 3 months
@@ -23,7 +43,7 @@ async function generateHistoricalData() {
     'LINK': 18.5,
     'LTC': 114,
     'BCH': 524,
-    'TON': 1.38,
+    'TON': 1.42, // Tokamak Network TON current price
     'GOLD': 55568
   };
   
@@ -55,12 +75,20 @@ async function generateHistoricalData() {
   const totalHours = 90 * 24; // 90 days * 24 hours
   let currentPrice = { ...basePrices };
   
+  // Start TON from a lower price to create realistic growth
+  currentPrice['TON'] = 1.15; // Start from $1.15 and grow to current $1.42
+  
   for (let i = 0; i < totalHours; i++) {
     const timestamp = new Date(threeMonthsAgo.getTime() + (i * 60 * 60 * 1000));
     
     // Update prices with realistic variations
     for (const [symbol, basePrice] of Object.entries(basePrices)) {
-      currentPrice[symbol] = generatePriceVariation(currentPrice[symbol], 0.02); // 2% volatility per hour
+      if (symbol === 'TON') {
+        // Use special TON price movement function
+        currentPrice[symbol] = generateTONPriceMovement(currentPrice[symbol], i, totalHours);
+      } else {
+        currentPrice[symbol] = generatePriceVariation(currentPrice[symbol], 0.02); // 2% volatility per hour
+      }
       
       // Ensure prices stay within reasonable bounds
       if (symbol === 'BTC') currentPrice[symbol] = Math.max(80000, Math.min(150000, currentPrice[symbol]));
@@ -71,7 +99,7 @@ async function generateHistoricalData() {
       else if (symbol === 'LINK') currentPrice[symbol] = Math.max(15, Math.min(25, currentPrice[symbol]));
       else if (symbol === 'LTC') currentPrice[symbol] = Math.max(100, Math.min(130, currentPrice[symbol]));
       else if (symbol === 'BCH') currentPrice[symbol] = Math.max(400, Math.min(600, currentPrice[symbol]));
-      else if (symbol === 'TON') currentPrice[symbol] = Math.max(1, Math.min(2, currentPrice[symbol]));
+      else if (symbol === 'TON') currentPrice[symbol] = Math.max(1.1, Math.min(1.7, currentPrice[symbol])); // Tokamak Network TON realistic range
       else if (symbol === 'GOLD') currentPrice[symbol] = Math.max(50000, Math.min(60000, currentPrice[symbol]));
       
       // Insert into database

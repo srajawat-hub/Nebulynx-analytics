@@ -72,12 +72,12 @@ const ASSET_CONFIG = {
     whitepaper: 'https://bitcoincash.org/bitcoin.pdf'
   },
   'TON': { 
-    coingecko_id: 'the-open-network',
+    coingecko_id: 'tokamak-network',
     binance_symbol: null, // Not available on Binance
     launch_date: '2018-07-12',
-    description: 'The Open Network (TON) is a decentralized blockchain platform designed to handle millions of transactions per second.',
-    website: 'https://ton.org',
-    whitepaper: 'https://ton.org/whitepaper.pdf'
+    description: 'Tokamak Network is a layer 2 scaling solution for Ethereum that enables high-performance DeFi applications.',
+    website: 'https://tokamak.network',
+    whitepaper: 'https://tokamak.network/whitepaper'
   },
   'GOLD': { 
     coingecko_id: 'gold',

@@ -99,6 +99,18 @@ function initializeDatabase() {
         )
       `);
 
+      // Create favorites table for user favorite assets
+      db.run(`
+        CREATE TABLE IF NOT EXISTS favorites (
+          id INTEGER PRIMARY KEY AUTOINCREMENT,
+          user_id INTEGER,
+          asset_symbol TEXT NOT NULL,
+          asset_name TEXT NOT NULL,
+          added_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+          UNIQUE(user_id, asset_symbol)
+        )
+      `);
+
       // Create indexes for better performance
       db.run(`CREATE INDEX IF NOT EXISTS idx_price_history_symbol_timestamp ON price_history(asset_symbol, timestamp)`);
       db.run(`CREATE INDEX IF NOT EXISTS idx_price_history_hourly_symbol_timestamp ON price_history_hourly(asset_symbol, timestamp)`);

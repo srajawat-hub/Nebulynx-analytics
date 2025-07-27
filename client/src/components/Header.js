@@ -1,6 +1,6 @@
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { FaChartLine, FaBell, FaPlus, FaHome } from 'react-icons/fa';
+import { FaChartLine, FaBell, FaPlus, FaHome, FaHeart } from 'react-icons/fa';
 
 const Header = () => {
   const location = useLocation();
@@ -8,7 +8,8 @@ const Header = () => {
   const navItems = [
     { path: '/', label: 'Dashboard', icon: <FaHome /> },
     { path: '/prices', label: 'Prices', icon: <FaChartLine /> },
-    { path: '/alerts', label: 'Alerts', icon: <FaBell /> },
+    { path: '/favorites', label: 'Favorites', icon: <FaHeart /> },
+    { path: '/alerts', label: 'Price Alerts', icon: <FaBell /> },
     { path: '/notifications', label: 'Notifications', icon: <FaBell /> },
   ];
 
@@ -24,12 +25,26 @@ const Header = () => {
       <div className="container">
         <div className="flex flex-between" style={{ padding: '16px 0' }}>
           <Link to="/" style={{ textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '12px' }}>
-            {/* New Logo SVG */}
-            <svg width="40" height="40" viewBox="0 0 40 40" fill="none" xmlns="http://www.w3.org/2000/svg">
-              <circle cx="20" cy="20" r="20" fill="#667eea"/>
-              <text x="12" y="28" fontFamily="Inter, Arial" fontWeight="bold" fontSize="22" fill="white">N</text>
-              <polygon points="32,8 36,16 28,16" fill="#FFD700"/>
-            </svg>
+            {/* Original Logo */}
+            <div style={{
+              width: '40px',
+              height: '40px',
+              background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+              borderRadius: '12px',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+            }}>
+              <span style={{
+                color: 'white',
+                fontSize: '20px',
+                fontWeight: 'bold',
+                fontFamily: 'Inter, Arial, sans-serif',
+              }}>
+                N
+              </span>
+            </div>
             <h1 style={{
               background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
               WebkitBackgroundClip: 'text',
@@ -50,6 +65,7 @@ const Header = () => {
               gap: '1rem',
               margin: 0,
               padding: 0,
+              alignItems: 'center',
             }}>
               {navItems.map((item) => (
                 <li key={item.path}>
@@ -66,10 +82,27 @@ const Header = () => {
                       borderRadius: '8px',
                       transition: 'all 0.2s ease',
                       background: location.pathname === item.path ? 'rgba(102, 126, 234, 0.1)' : 'transparent',
+                      whiteSpace: 'nowrap',
+                    }}
+                    onMouseEnter={(e) => {
+                      if (location.pathname !== item.path) {
+                        e.target.style.background = 'rgba(102, 126, 234, 0.05)';
+                        e.target.style.color = '#667eea';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (location.pathname !== item.path) {
+                        e.target.style.background = 'transparent';
+                        e.target.style.color = '#666';
+                      }
                     }}
                   >
                     {item.icon}
-                    <span style={{ display: 'none', '@media (min-width: 768px)': { display: 'inline' } }}>
+                    <span style={{ 
+                      display: 'inline',
+                      fontSize: '14px',
+                      fontWeight: '500',
+                    }}>
                       {item.label}
                     </span>
                   </Link>
@@ -84,10 +117,30 @@ const Header = () => {
                     alignItems: 'center',
                     gap: '8px',
                     textDecoration: 'none',
+                    background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+                    color: 'white',
+                    padding: '12px 16px',
+                    borderRadius: '8px',
+                    fontWeight: '600',
+                    transition: 'all 0.2s ease',
+                    boxShadow: '0 4px 12px rgba(102, 126, 234, 0.3)',
+                    whiteSpace: 'nowrap',
+                  }}
+                  onMouseEnter={(e) => {
+                    e.target.style.transform = 'translateY(-2px)';
+                    e.target.style.boxShadow = '0 6px 20px rgba(102, 126, 234, 0.4)';
+                  }}
+                  onMouseLeave={(e) => {
+                    e.target.style.transform = 'translateY(0)';
+                    e.target.style.boxShadow = '0 4px 12px rgba(102, 126, 234, 0.3)';
                   }}
                 >
                   <FaPlus />
-                  <span style={{ display: 'none', '@media (min-width: 768px)': { display: 'inline' } }}>
+                  <span style={{ 
+                    display: 'inline',
+                    fontSize: '14px',
+                    fontWeight: '600',
+                  }}>
                     New Alert
                   </span>
                 </Link>

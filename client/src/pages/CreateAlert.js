@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { FaArrowLeft, FaSave } from 'react-icons/fa';
 import axios from 'axios';
 import toast from 'react-hot-toast';
+import Header from '../components/Header';
 
 const CreateAlert = () => {
   const navigate = useNavigate();
@@ -80,21 +81,24 @@ const CreateAlert = () => {
   }
 
   return (
-    <div>
-      <div className="flex flex-between mb-3">
-        <div className="flex" style={{ alignItems: 'center', gap: '16px' }}>
-          <button
-            onClick={() => navigate(-1)}
-            className="btn btn-secondary"
-            style={{ padding: '8px 12px' }}
-          >
-            <FaArrowLeft />
-          </button>
-          <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#222', margin: 0 }}>
-            Create Price Alert
-          </h1>
-        </div>
-      </div>
+    <div className="modern-min-h-screen modern-bg-gradient">
+      <Header />
+      <div className="modern-container" style={{ maxWidth: '100%', padding: '0 2rem' }}>
+        <div className="modern-p-6">
+          <div className="modern-mb-8">
+            <div className="modern-flex" style={{ alignItems: 'center', gap: '16px' }}>
+              <button
+                onClick={() => navigate(-1)}
+                className="modern-button modern-button-secondary"
+                style={{ padding: '8px 12px' }}
+              >
+                <FaArrowLeft />
+              </button>
+              <h1 style={{ fontSize: '32px', fontWeight: '700', color: '#222', margin: 0 }}>
+                Create Price Alert
+              </h1>
+            </div>
+          </div>
       <p style={{ fontSize: '16px', color: '#444', marginBottom: '24px' }}>
         Set up a new price alert for any supported asset. You’ll get an email notification when your alert is triggered.
       </p>
@@ -254,6 +258,8 @@ const CreateAlert = () => {
               Asset: Ethereum (ETH) | Condition: Below $3,000
             </div>
           </div>
+        </div>
+      </div>
         </div>
       </div>
     </div>

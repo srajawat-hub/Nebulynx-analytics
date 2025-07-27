@@ -7,7 +7,21 @@ const { getDatabase } = require('../database/database');
 const COINGECKO_API = 'https://api.coingecko.com/api/v3';
 const BINANCE_API = 'https://api.binance.com/api/v3';
 const CRYPTOCOMPARE_API = 'https://min-api.cryptocompare.com/data';
+const COINPAPRIKA_API = 'https://api.coinpaprika.com/v1';
 const EXCHANGE_RATE_API = 'https://api.exchangerate-api.com/v4/latest/USD';
+
+// GoldAPI.io configuration
+const GOLDAPI_BASE_URL = 'https://www.goldapi.io/api';
+const GOLDAPI_TOKEN = process.env.GOLDAPI_TOKEN || 'goldapi-e241smdlkh80z-io';
+
+// MetalpriceAPI configuration
+const METALPRICEAPI_BASE_URL = 'https://api.metalpriceapi.com/v1';
+const METALPRICEAPI_KEY = process.env.METALPRICEAPI_KEY || '080cdd4a9c1c116fbb3b4efc1328c314';
+
+// Gold price caching for optimization (once per day as per free plan)
+let cachedGoldPrice = null;
+let lastGoldPriceUpdate = 0;
+const GOLD_UPDATE_INTERVAL = 24 * 60 * 60 * 1000; // 24 hours (once per day)
 
 // Supported assets with their API identifiers
 const SUPPORTED_ASSETS = {
@@ -51,8 +65,30 @@ async function fetchCryptoPrice(symbol) {
   const config = SUPPORTED_ASSETS[symbol];
   if (!config) return null;
 
-  // Special handling for TON (Tokamak Network) - Only CoinGecko has the correct data
+  // Special handling for TON (Tokamak Network) - Try CoinPaprika first, then CoinGecko
   if (symbol === 'TON') {
+    // Try CoinPaprika first (most reliable for Tokamak Network TON)
+    try {
+      await new Promise(resolve => setTimeout(resolve, 300));
+      
+      console.log(`🔍 Trying CoinPaprika for ${symbol} (Tokamak Network)...`);
+      const response = await axios.get(`${COINPAPRIKA_API}/tickers/ton-tokamak-network`, {
+        timeout: 10000,
+        headers: {
+          'User-Agent': 'Trading-Notification-App/1.0'
+        }
+      });
+      
+      const price = response.data?.quotes?.USD?.price;
+      if (price && price > 0) {
+        console.log(`✅ Real ${symbol} (Tokamak Network) price from CoinPaprika: $${price}`);
+        return price;
+      }
+    } catch (error) {
+      console.log(`❌ CoinPaprika failed for ${symbol} (Tokamak Network): ${error.message}`);
+    }
+    
+    // Fallback to CoinGecko
     try {
       await new Promise(resolve => setTimeout(resolve, 500));
       
@@ -81,8 +117,8 @@ async function fetchCryptoPrice(symbol) {
       }
     }
     
-    console.log(`⚠️ CoinGecko failed for ${symbol} (Tokamak Network), using fallback price`);
-    return 1.37; // Current approximate price for Tokamak Network TON
+    console.log(`⚠️ All APIs failed for ${symbol} (Tokamak Network), using fallback price`);
+    return 1.42; // Current approximate price for Tokamak Network TON
   }
 
   // Standard APIs for other cryptocurrencies
@@ -92,6 +128,12 @@ async function fetchCryptoPrice(symbol) {
       url: `${BINANCE_API}/ticker/price`,
       params: { symbol: `${symbol}USDT` },
       extract: (data) => parseFloat(data.price)
+    },
+    {
+      name: 'CoinPaprika',
+      url: `${COINPAPRIKA_API}/tickers/${config.coingecko_id}`,
+      params: {},
+      extract: (data) => data?.quotes?.USD?.price
     },
     {
       name: 'CryptoCompare',
@@ -149,32 +191,81 @@ async function fetchCryptoPrice(symbol) {
     'LINK': 15.5,
     'LTC': 75,
     'BCH': 240,
-    'TON': 1.4
+    'TON': 1.42
   };
   return fallbackPrices[symbol] || null;
 }
 
-// Fetch gold price using multiple free APIs
+// Fetch gold price using MetalpriceAPI (optimized for free plan)
 async function fetchGoldPrice() {
-  const apis = [
-    {
-      name: 'Gold Price API (USD to INR)',
-      url: 'https://api.metals.live/v1/spot/gold',
-      extract: async (data) => {
-        try {
-          const goldPriceUSD = data[0]?.price;
-          if (goldPriceUSD) {
-            // Convert USD to INR (1 USD = ~83 INR)
-            const usdToINR = await getUSDToINRRate();
-            const goldPriceINR = (goldPriceUSD * usdToINR * 10); // 10 grams
-            return Math.round(goldPriceINR);
-          }
-        } catch (error) {
-          console.log('Error extracting gold price from metals.live:', error.message);
-        }
-        return null;
+  const now = Date.now();
+
+  // Return cached price if it's still valid (within 24 hours)
+  if (cachedGoldPrice && (now - lastGoldPriceUpdate) < GOLD_UPDATE_INTERVAL) {
+    console.log(`✅ Using cached gold price: ₹${cachedGoldPrice.toLocaleString()} INR (last updated: ${new Date(lastGoldPriceUpdate).toLocaleString()})`);
+    return cachedGoldPrice;
+  }
+
+  // Try MetalpriceAPI (primary source)
+  try {
+    console.log('🔍 Trying MetalpriceAPI for gold price (USD to INR)...');
+    
+    // Step 1: Get gold price in USD
+    const goldResponse = await axios.get(`${METALPRICEAPI_BASE_URL}/latest`, {
+      timeout: 15000,
+      params: {
+        api_key: METALPRICEAPI_KEY,
+        base: 'USD',
+        currencies: 'XAU'
       }
-    },
+    });
+
+    if (goldResponse.data && goldResponse.data.success && goldResponse.data.rates) {
+      const goldPriceUSD = goldResponse.data.rates.USDXAU; // Price per troy ounce in USD
+      
+      // Step 2: Convert USD to INR
+      const conversionResponse = await axios.get(`${METALPRICEAPI_BASE_URL}/convert`, {
+        timeout: 15000,
+        params: {
+          api_key: METALPRICEAPI_KEY,
+          from: 'USD',
+          to: 'INR',
+          amount: goldPriceUSD
+        }
+      });
+
+      if (conversionResponse.data && conversionResponse.data.success) {
+        // Convert from troy ounce to 10 grams (standard Indian gold unit)
+        // 1 troy ounce = 31.1035 grams
+        // We want price for 10 grams
+        const troyOunceToGrams = 31.1035;
+        const gramsPerUnit = 10;
+        const goldPriceINR = Math.round((conversionResponse.data.result / troyOunceToGrams) * gramsPerUnit);
+        
+        cachedGoldPrice = goldPriceINR;
+        lastGoldPriceUpdate = now;
+        
+        console.log(`✅ Real Gold price from MetalpriceAPI: ₹${goldPriceINR.toLocaleString()} INR (per 10 grams)`);
+        console.log(`📊 Gold API Response: ${JSON.stringify({
+          gold_usd_per_troy_ounce: goldPriceUSD,
+          usd_to_inr_rate: conversionResponse.data.info.quote,
+          gold_inr_per_troy_ounce: conversionResponse.data.result,
+          gold_inr_per_10_grams: goldPriceINR,
+          timestamp: new Date(goldResponse.data.timestamp * 1000).toLocaleString()
+        })}`);
+        
+        return goldPriceINR;
+      }
+    }
+  } catch (error) {
+    console.log(`❌ MetalpriceAPI failed: ${error.message}`);
+    if (error.response?.status === 429 || error.response?.status === 105) {
+      console.log('⚠️ MetalpriceAPI rate limited or quota exceeded, using fallback');
+    }
+  }
+
+  // Fallback APIs (only if MetalpriceAPI fails)
+  const fallbackApis = [
     {
       name: 'CoinGecko Gold Price',
       url: 'https://api.coingecko.com/api/v3/simple/price?ids=gold&vs_currencies=inr',
@@ -208,37 +299,108 @@ async function fetchGoldPrice() {
     }
   ];
 
-  for (const api of apis) {
+  for (const api of fallbackApis) {
     try {
       console.log(`🔍 Trying ${api.name} for gold price...`);
-      const response = await axios.get(api.url, { 
+      const response = await axios.get(api.url, {
         timeout: 10000,
         headers: {
           'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36'
         }
       });
-      
+
       const priceINR = await api.extract(response.data);
       if (priceINR && priceINR > 0) {
-        console.log(`✅ Real Gold price from ${api.name}: ₹${priceINR.toLocaleString()} INR`);
+        cachedGoldPrice = priceINR;
+        lastGoldPriceUpdate = now;
+        console.log(`✅ Real Gold price from ${api.name}: ₹${priceINR.toLocaleString()} INR (per 10 grams)`);
         return priceINR;
       }
     } catch (error) {
       console.log(`❌ ${api.name} failed: ${error.message}`);
     }
   }
-  
-  // If all APIs fail, try to get a reasonable estimate
+
+  // If all APIs fail, use cached price or reasonable estimate
+  if (cachedGoldPrice) {
+    console.log(`⚠️ Using cached gold price: ₹${cachedGoldPrice.toLocaleString()} INR`);
+    return cachedGoldPrice;
+  }
+
+  // Final fallback - current market price for 10 grams of gold in INR
+  console.log('⚠️ All gold APIs failed, using estimated price');
+  return 100885; // Current market price estimate for 10 grams (Mumbai 24K gold)
+}
+
+// Fetch historical gold prices for the last 3 months
+async function fetchHistoricalGoldPrices() {
+  const historicalPrices = [];
+  const today = new Date();
+
   try {
-    console.log('🔍 Trying to get USD gold price and convert...');
-    const usdToINR = await getUSDToINRRate();
-    const estimatedGoldPriceUSD = 2000; // Approximate current gold price per ounce
-    const goldPriceINR = (estimatedGoldPriceUSD * usdToINR * 0.3215); // Convert ounce to 10 grams
-    console.log(`⚠️ Using estimated gold price: ₹${Math.round(goldPriceINR).toLocaleString()} INR`);
-    return Math.round(goldPriceINR);
+    console.log('📊 Fetching historical gold prices for 3-month graph...');
+
+    // Generate dates for the last 90 days
+    for (let i = 90; i >= 0; i--) {
+      const date = new Date(today);
+      date.setDate(date.getDate() - i);
+      const dateStr = date.toISOString().split('T')[0];
+
+      try {
+        // Get historical gold price for this date
+        const goldResponse = await axios.get(`${METALPRICEAPI_BASE_URL}/${dateStr}`, {
+          timeout: 10000,
+          params: {
+            api_key: METALPRICEAPI_KEY,
+            base: 'USD',
+            currencies: 'XAU'
+          }
+        });
+
+        if (goldResponse.data && goldResponse.data.success && goldResponse.data.rates) {
+          const goldPriceUSD = goldResponse.data.rates.USDXAU;
+          
+          // Convert to INR for this date
+          const conversionResponse = await axios.get(`${METALPRICEAPI_BASE_URL}/convert`, {
+            timeout: 10000,
+            params: {
+              api_key: METALPRICEAPI_KEY,
+              from: 'USD',
+              to: 'INR',
+              amount: goldPriceUSD,
+              date: dateStr
+            }
+          });
+
+          if (conversionResponse.data && conversionResponse.data.success) {
+            // Convert from troy ounce to 10 grams (standard Indian gold unit)
+            const troyOunceToGrams = 31.1035;
+            const gramsPerUnit = 10;
+            const goldPriceINR = Math.round((conversionResponse.data.result / troyOunceToGrams) * gramsPerUnit);
+            
+            historicalPrices.push({
+              date: dateStr,
+              price: goldPriceINR,
+              timestamp: goldResponse.data.timestamp
+            });
+          }
+        }
+
+        // Add delay to avoid rate limiting
+        await new Promise(resolve => setTimeout(resolve, 200));
+
+      } catch (error) {
+        // Skip failed dates, continue with others
+        console.log(`⚠️ Failed to fetch gold price for ${dateStr}: ${error.message}`);
+      }
+    }
+
+    console.log(`✅ Fetched ${historicalPrices.length} historical gold prices`);
+    return historicalPrices;
+
   } catch (error) {
-    console.log('⚠️ All gold APIs failed, using current market price');
-    return 55549; // Current market price (much more realistic than 103000)
+    console.log(`❌ Failed to fetch historical gold prices: ${error.message}`);
+    return [];
   }
 }
 
@@ -404,5 +566,6 @@ function startPriceMonitoring() {
 module.exports = {
   startPriceMonitoring,
   fetchAllPrices,
+  fetchHistoricalGoldPrices,
   SUPPORTED_ASSETS
 }; 

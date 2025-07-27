@@ -1,15 +1,33 @@
-const { Resend } = require('resend');
+const nodemailer = require('nodemailer');
 const { getDatabase } = require('../database/database');
 
-// Email configuration using Resend (free tier: 100 emails/day)
-const resend = new Resend(process.env.RESEND_API_KEY || 're_1234567890');
+// Gmail SMTP configuration (FREE, no domain required, can send to any email)
+let transporter = null;
+
+// Initialize Gmail SMTP transporter
+function initializeEmailService() {
+  if (process.env.GMAIL_USER && process.env.GMAIL_APP_PASSWORD) {
+    transporter = nodemailer.createTransport({
+      service: 'gmail',
+      auth: {
+        user: process.env.GMAIL_USER,
+        pass: process.env.GMAIL_APP_PASSWORD
+      }
+    });
+    console.log('✅ Gmail SMTP configured successfully');
+    return true;
+  } else {
+    console.log('⚠️ Gmail credentials not configured, using demo mode');
+    return false;
+  }
+}
 
 async function sendEmailNotification(alert, currentPriceData) {
   const { asset_name, asset_symbol, currency, threshold_price, condition_type, notification_email } = alert;
   const { price: currentPrice } = currentPriceData;
   
-  // If email is not configured, use demo notification
-  if (!process.env.RESEND_API_KEY || process.env.RESEND_API_KEY === 're_1234567890') {
+  // If Gmail is not configured, use demo notification
+  if (!transporter) {
     return sendDemoNotification(alert, currentPriceData);
   }
   
@@ -19,70 +37,75 @@ async function sendEmailNotification(alert, currentPriceData) {
   const direction = condition_type === 'above' ? '📈' : '📉';
   
   const html = `
-    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
-      <h2 style="color: #e74c3c; text-align: center;">${direction} Price Alert Triggered!</h2>
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; padding: 20px; border: 1px solid #ddd; border-radius: 8px; background-color: #f9f9f9;">
+      <div style="text-align: center; margin-bottom: 20px;">
+        <h2 style="color: #e74c3c; margin: 0; font-size: 24px;">${direction} Price Alert Triggered!</h2>
+        <p style="color: #7f8c8d; margin: 5px 0;">Nebulynx Research Trading Alerts</p>
+      </div>
       
-      <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
-        <h3 style="margin-top: 0; color: #2c3e50;">${asset_name} (${asset_symbol})</h3>
+      <div style="background-color: white; padding: 25px; border-radius: 8px; margin: 20px 0; box-shadow: 0 2px 10px rgba(0,0,0,0.1);">
+        <h3 style="margin-top: 0; color: #2c3e50; font-size: 20px; border-bottom: 2px solid #3498db; padding-bottom: 10px;">
+          ${asset_name} (${asset_symbol})
+        </h3>
         
-        <div style="display: flex; justify-content: space-between; margin: 15px 0;">
-          <span style="font-weight: bold;">Current Price:</span>
+        <div style="display: flex; justify-content: space-between; margin: 15px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+          <span style="font-weight: bold; color: #2c3e50;">Current Price:</span>
           <span style="color: #e74c3c; font-weight: bold; font-size: 18px;">
             ${currency} ${currentPrice.toLocaleString()}
           </span>
         </div>
         
-        <div style="display: flex; justify-content: space-between; margin: 15px 0;">
-          <span style="font-weight: bold;">Alert Threshold:</span>
+        <div style="display: flex; justify-content: space-between; margin: 15px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+          <span style="font-weight: bold; color: #2c3e50;">Alert Threshold:</span>
           <span style="color: #3498db; font-weight: bold;">
             ${currency} ${threshold_price.toLocaleString()}
           </span>
         </div>
         
-        <div style="display: flex; justify-content: space-between; margin: 15px 0;">
-          <span style="font-weight: bold;">Condition:</span>
+        <div style="display: flex; justify-content: space-between; margin: 15px 0; padding: 10px; background-color: #f8f9fa; border-radius: 5px;">
+          <span style="font-weight: bold; color: #2c3e50;">Condition:</span>
           <span style="color: #27ae60; font-weight: bold;">
             ${condition_type.toUpperCase()}
           </span>
         </div>
       </div>
       
-      <div style="text-align: center; margin-top: 30px;">
-        <p style="color: #7f8c8d; font-size: 14px;">
+      <div style="text-align: center; margin-top: 30px; padding: 20px; background-color: #ecf0f1; border-radius: 8px;">
+        <p style="color: #7f8c8d; font-size: 14px; margin: 5px 0;">
           This alert was triggered because ${asset_name} price is now ${conditionText} your threshold of ${currency} ${threshold_price.toLocaleString()}.
         </p>
         
-        <p style="color: #7f8c8d; font-size: 14px;">
-          Time: ${new Date().toLocaleString()}
+        <p style="color: #7f8c8d; font-size: 14px; margin: 5px 0;">
+          <strong>Time:</strong> ${new Date().toLocaleString()}
         </p>
       </div>
       
-      <div style="margin-top: 30px; padding-top: 20px; border-top: 1px solid #ddd; text-align: center;">
-        <p style="color: #95a5a6; font-size: 12px;">
-          Trading Notification System<br>
-          Stay informed about market movements
+      <div style="margin-top: 30px; padding-top: 20px; border-top: 2px solid #bdc3c7; text-align: center;">
+        <p style="color: #95a5a6; font-size: 12px; margin: 5px 0;">
+          <strong>Nebulynx Research</strong><br>
+          Real-time cryptocurrency and commodity price monitoring
+        </p>
+        <p style="color: #95a5a6; font-size: 11px; margin: 5px 0;">
+          Stay informed about market movements with our advanced alert system
         </p>
       </div>
     </div>
   `;
   
+  const mailOptions = {
+    from: `"Nebulynx Research" <${process.env.GMAIL_USER}>`,
+    to: notification_email,
+    subject: subject,
+    html: html
+  };
+  
   try {
-    const { data, error } = await resend.emails.send({
-      from: 'Trading Alerts <onboarding@resend.dev>',
-      to: [notification_email],
-      subject: subject,
-      html: html
-    });
-    
-    if (error) {
-      console.error('Error sending email notification:', error);
-      return false;
-    }
-    
-    console.log(`Email notification sent to ${notification_email} for ${asset_symbol}`);
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✅ Email notification sent to ${notification_email} for ${asset_symbol}`);
+    console.log(`📧 Message ID: ${info.messageId}`);
     return true;
   } catch (error) {
-    console.error('Error sending email notification:', error);
+    console.error('❌ Error sending email notification:', error);
     return false;
   }
 }
@@ -146,12 +169,21 @@ function sendDemoNotification(alert, currentPriceData) {
   console.log(`Threshold: ${currency} ${threshold_price.toLocaleString()}`);
   console.log(`Condition: ${condition_type.toUpperCase()}`);
   console.log(`Time: ${new Date().toLocaleString()}`);
+  console.log('='.repeat(60));
+  console.log('💡 To enable real email notifications:');
+  console.log('   1. Enable 2FA on your Gmail account');
+  console.log('   2. Generate an App Password');
+  console.log('   3. Add GMAIL_USER and GMAIL_APP_PASSWORD to .env file');
   console.log('='.repeat(60) + '\n');
   
   return true;
 }
 
+// Initialize email service when module loads
+initializeEmailService();
+
 module.exports = {
   sendNotification,
-  sendDemoNotification
+  sendDemoNotification,
+  initializeEmailService
 }; 

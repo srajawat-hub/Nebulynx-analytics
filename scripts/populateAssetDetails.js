@@ -64,11 +64,11 @@ const ENHANCED_ASSET_CONFIG = {
     whitepaper: 'https://bitcoincash.org/bitcoin.pdf'
   },
   'TON': { 
-    coingecko_id: 'the-open-network',
+    coingecko_id: 'tokamak-network',
     launch_date: '2018-07-12',
-    description: 'The Open Network (TON) is a decentralized blockchain platform designed to handle millions of transactions per second.',
-    website: 'https://ton.org',
-    whitepaper: 'https://ton.org/whitepaper.pdf'
+    description: 'Tokamak Network is a layer 2 scaling solution for Ethereum that enables high-performance DeFi applications.',
+    website: 'https://tokamak.network',
+    whitepaper: 'https://tokamak.network/whitepaper'
   },
   'GOLD': { 
     coingecko_id: 'gold',
@@ -145,7 +145,7 @@ const CURRENT_MARKET_DATA = {
     max_supply: 21000000,
     price: 205
   },
-  'TON': { 
+      'TON': { 
     market_cap: 685000000, 
     volume_24h: 5000000, 
     circulating_supply: 500000000, 

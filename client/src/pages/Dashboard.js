@@ -4,6 +4,7 @@ import { FaChartLine, FaBell, FaEye, FaPlus, FaArrowRight, FaCaretUp, FaCaretDow
 import axios from 'axios';
 import toast from 'react-hot-toast';
 import CoinLogo from '../components/CoinLogo';
+import Header from '../components/Header';
 
 const Dashboard = () => {
   const [prices, setPrices] = useState({});
@@ -103,89 +104,7 @@ const Dashboard = () => {
 
   return (
     <div className="modern-min-h-screen modern-bg-gradient">
-      {/* Main Header - Logo and Navigation */}
-      <div className="modern-header" style={{ 
-        borderBottom: '1px solid rgba(255, 255, 255, 0.1)',
-        background: 'rgba(255, 255, 255, 0.95)',
-        backdropFilter: 'blur(20px)',
-        boxShadow: '0 4px 20px rgba(0, 0, 0, 0.1)'
-      }}>
-        <div className="modern-container" style={{ maxWidth: '100%', padding: '0 2rem' }}>
-          <div className="modern-flex modern-flex-between modern-p-6">
-            {/* Left Side - Stylish Logo */}
-            <div className="modern-flex modern-items-center modern-space-x-4">
-              {/* Enhanced Logo */}
-              <div className="modern-relative">
-                <div className="modern-w-12 modern-h-12 modern-rounded-2xl modern-gradient-bg-blue modern-flex modern-items-center modern-justify-center" style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  boxShadow: '0 8px 32px rgba(102, 126, 234, 0.3)'
-                }}>
-                  <FaChartLine className="modern-text-white" style={{ fontSize: '1.5rem' }} />
-                </div>
-                {/* Decorative elements */}
-                <div className="modern-absolute -modern-top-1 -modern-right-1 modern-w-4 modern-h-4 modern-bg-yellow-400 modern-rounded-full" style={{
-                  background: 'linear-gradient(135deg, #fbbf24 0%, #f59e0b 100%)',
-                  boxShadow: '0 2px 8px rgba(251, 191, 36, 0.4)'
-                }}></div>
-              </div>
-              
-              {/* Enhanced Text */}
-              <div>
-                <h1 className="modern-text-3xl modern-font-black modern-text-gradient" style={{
-                  background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-                  WebkitBackgroundClip: 'text',
-                  WebkitTextFillColor: 'transparent',
-                  backgroundClip: 'text',
-                  letterSpacing: '-0.025em',
-                  textShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
-                }}>
-                  <span style={{ fontSize: '2.5rem', fontWeight: '900' }}>N</span>
-                  <span style={{ fontSize: '1.8rem', fontWeight: '600' }}>ebulynx</span>
-                  <span style={{ fontSize: '1.8rem', fontWeight: '600' }}> Research</span>
-                </h1>
-              </div>
-            </div>
-
-            {/* Right Side - Navigation and Live Indicator */}
-            <div className="modern-flex modern-items-center modern-space-x-6">
-              {/* Navigation Links */}
-              <div className="modern-flex modern-items-center modern-space-x-4">
-                <Link to="/prices" className="modern-flex modern-items-center modern-space-x-2 modern-px-5 modern-py-3 modern-rounded-xl modern-bg-white-70 modern-border-white-20 hover:modern-bg-white-90 modern-transition" style={{ 
-                  textDecoration: 'none',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
-                }}>
-                  <FaChartLine className="modern-text-green-600" size={18} />
-                  <span className="modern-text-gray-700 modern-font-semibold">Prices</span>
-                </Link>
-                
-                <Link to="/alerts" className="modern-flex modern-items-center modern-space-x-2 modern-px-5 modern-py-3 modern-rounded-xl modern-bg-white-70 modern-border-white-20 hover:modern-bg-white-90 modern-transition" style={{ 
-                  textDecoration: 'none',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
-                }}>
-                  <FaBell className="modern-text-orange-600" size={18} />
-                  <span className="modern-text-gray-700 modern-font-semibold">Alerts</span>
-                </Link>
-                
-                <Link to="/notifications" className="modern-flex modern-items-center modern-space-x-2 modern-px-5 modern-py-3 modern-rounded-xl modern-bg-white-70 modern-border-white-20 hover:modern-bg-white-90 modern-transition" style={{ 
-                  textDecoration: 'none',
-                  background: 'rgba(255, 255, 255, 0.8)',
-                  border: '1px solid rgba(255, 255, 255, 0.3)',
-                  boxShadow: '0 2px 8px rgba(0, 0, 0, 0.05)'
-                }}>
-                  <FaEye className="modern-text-green-600" size={18} />
-                  <span className="modern-text-gray-700 modern-font-semibold">Notifications</span>
-                </Link>
-              </div>
-
-
-            </div>
-          </div>
-        </div>
-      </div>
+      <Header />
 
       {/* Search Section - Separated with more spacing */}
       <div className="modern-header" style={{ 
