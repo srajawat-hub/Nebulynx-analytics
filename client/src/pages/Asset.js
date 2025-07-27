@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, Link, useNavigate } from 'react-router-dom';
-import { FaArrowLeft, FaGlobe, FaFileAlt, FaGithub, FaTwitter, FaReddit, FaChartLine, FaBell, FaEye, FaPlus, FaCaretUp, FaCaretDown, FaMinus, FaSearch, FaTimes } from 'react-icons/fa';
+import { useParams, Link } from 'react-router-dom';
+import { FaArrowLeft, FaGlobe, FaFileAlt, FaGithub, FaTwitter, FaReddit, FaChartLine, FaBell, FaCaretUp, FaCaretDown, FaMinus } from 'react-icons/fa';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -9,7 +9,6 @@ import Header from '../components/Header';
 
 const Asset = () => {
   const { symbol } = useParams();
-  const navigate = useNavigate();
   const [assetDetails, setAssetDetails] = useState(null);
   const [priceHistory, setPriceHistory] = useState({});
   const [currentPrice, setCurrentPrice] = useState(null);

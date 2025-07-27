@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FaHeart, FaRegHeart } from 'react-icons/fa';
 import axios from 'axios';
 import toast from 'react-hot-toast';
@@ -7,18 +7,18 @@ const FavoriteButton = ({ symbol, size = 20, className = '', showToast = true })
   const [isFavorite, setIsFavorite] = useState(false);
   const [loading, setLoading] = useState(false);
 
-  useEffect(() => {
-    checkFavoriteStatus();
-  }, [symbol]);
-
-  const checkFavoriteStatus = async () => {
+  const checkFavoriteStatus = useCallback(async () => {
     try {
       const response = await axios.get(`/api/favorites/check/${symbol}`);
       setIsFavorite(response.data.data.is_favorite);
     } catch (error) {
       console.error('Error checking favorite status:', error);
     }
-  };
+  }, [symbol]);
+
+  useEffect(() => {
+    checkFavoriteStatus();
+  }, [checkFavoriteStatus]);
 
   const toggleFavorite = async () => {
     if (loading) return;
